@@ -21,15 +21,13 @@
         android:headerDividersEnabled="true"
         android:footerDividersEnabled="true"
         android:dividerHeight="1dp"
+        android:layout_height="325dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_height="325dp" />
+        android:layout_alignParentStart="true" />
 
     <TextView
         android:id="@+id/topLabel_ADVICTORIUM"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:maxLines="2"
         android:text="DEATH TO THE INSTITUTE\nAD VICTORIUM"
         android:gravity="center_horizontal"
@@ -37,21 +35,31 @@
         android:fontFamily="serif-monospace"
         android:textSize="18sp"
         android:textColor="@color/colorADVICTORIUM"
-        android:layout_above="@+id/audioList"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginBottom="13dp"
         android:textStyle="normal|bold"
         android:onClick="AD_VICTORIUM"
-        android:clickable="true"/>
+        android:clickable="true"
+        android:layout_height="wrap_content"
+        android:lineSpacingExtra="10sp"
+        android:layout_width="wrap_content"
+        android:layout_above="@+id/audioList"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="21dp" />
 
     <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/MANIFEST_DESTINY"
+        android:paddingLeft="0dp"
+        android:paddingRight="0dp"
+        android:layout_width="85dp"
         app:srcCompat="@drawable/bosicon"
-        android:id="@+id/imageButton2"
-        android:layout_marginTop="101dp"
-        android:layout_alignParentTop="true"
-        android:elevation="0dp" />
+        android:adjustViewBounds="false"
+        android:scaleType="fitCenter"
+        android:cropToPadding="true"
+        android:background="@android:color/transparent"
+
+        style="@android:style/Widget.ImageButton"
+        android:layout_height="85dp"
+        android:layout_above="@+id/audioList"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
 </RelativeLayout>
