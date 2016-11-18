@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_main"
     android:layout_width="wrap_content"
@@ -43,5 +44,14 @@
         android:textStyle="normal|bold"
         android:onClick="AD_VICTORIUM"
         android:clickable="true"/>
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/bosicon"
+        android:id="@+id/imageButton2"
+        android:layout_marginTop="101dp"
+        android:layout_alignParentTop="true"
+        android:elevation="0dp" />
 
 </RelativeLayout>

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.VolumeProvider;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -22,17 +23,19 @@ import java.lang.reflect.Field;
 
 public class MainActivity extends AppCompatActivity {
 
+    int AD_VICTORIUM;
     int ARRAY_OF_DEMOCRACY[];
     String ARRAY_OF_LIBERTY[];
     ListView ARRAY_OF_FREEDOM;
 
     AudioManager LET_FREEDOM_RING;
     TextView DEATH_TO_THE_INSTITUTE;
+
+    MediaPlayer LIBERTY_BELL, BETTER_DEAD_THAN_RED;
+
     MainActivity(){
         DECLARATION_OF_INDEPENDENCE();
     }
-
-    private MediaPlayer LIBERTY_BELL;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,34 +48,42 @@ public class MainActivity extends AppCompatActivity {
         LET_FREEDOM_RING.setStreamVolume(AudioManager.STREAM_MUSIC, 100, 0);
 
         ARRAY_OF_FREEDOM = (ListView) findViewById(R.id.audioList);
-        ArrayAdapter LIBERTY = new ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, ARRAY_OF_LIBERTY);
+        final ArrayAdapter LIBERTY = new ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, ARRAY_OF_LIBERTY);
         ARRAY_OF_FREEDOM.setAdapter(LIBERTY);
 
         LIBERTY_BELL = new MediaPlayer();
+        BETTER_DEAD_THAN_RED = new MediaPlayer();
 
         ARRAY_OF_FREEDOM.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
-                playSong(ARRAY_OF_DEMOCRACY[position]);
+                //playAudio(ARRAY_OF_DEMOCRACY[position]);
+                LIBERTY_BELL.reset();
+                LIBERTY_BELL = playVoice(ARRAY_OF_DEMOCRACY[position]);
+                LIBERTY_BELL.start();
             }
         });
 
         DEATH_TO_THE_INSTITUTE.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                playSong(ARRAY_OF_DEMOCRACY[0]);
+                BETTER_DEAD_THAN_RED.reset();
+                BETTER_DEAD_THAN_RED = playVoice(AD_VICTORIUM);
+                BETTER_DEAD_THAN_RED.start();
             }
         });
 
     }
+    
+    public MediaPlayer playVoice(int rawID){
 
-    public void playSong(int rawID){
-        LIBERTY_BELL.reset();
-        LIBERTY_BELL = MediaPlayer.create(this, rawID);
-        LIBERTY_BELL.setVolume(0.9f, 0.9f);
-        LIBERTY_BELL.start();
+        MediaPlayer a = new MediaPlayer();
+        a = MediaPlayer.create(this, rawID);
+        a.setVolume(0.9f, 0.9f);
+
+        return a;
     }
-
+    
     public void DECLARATION_OF_INDEPENDENCE() {
 
         Field fields[] = R.raw.class.getDeclaredFields();
@@ -84,10 +95,18 @@ public class MainActivity extends AppCompatActivity {
         // bug? 11/16/2016 : Found a string at Field[49] named "SerialVersionUID" which had an R.raw
         // value of 0.
 
-        for (int i = 0; i < fields.length; i++){
-            if (!BadStr_check(fields[i].getName())){
-                flen -= 1;
+        try {
+            for (int i = 0; i < fields.length; i++) {
+                if (!BadStr_check(fields[i].getName())) {
+                    flen -= 1;
+                }
+                if (fields[i].getName() == "primemarch") {
+                    AD_VICTORIUM = fields[i].getInt(null);
+                }
+
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         ARRAY_OF_DEMOCRACY = new int[flen];
@@ -111,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
                     //System.out.println(ARRAY_OF_LIBERTY[startIndstr]);
                 }
 
+
                 ARRAY_OF_LIBERTY[startIndstr] = ARRAY_OF_LIBERTY[startIndstr].replace("_", " ");
                 ARRAY_OF_DEMOCRACY[startIndstr] = fields[i].getInt(null);
 
@@ -129,6 +149,7 @@ public class MainActivity extends AppCompatActivity {
         // object made from R.raw.class.getDecalredFields
 
         if (a == "$change" ||
+            a == "primemarch" ||
             a == "serialVersionUID") {
             return Boolean.FALSE;
         }
