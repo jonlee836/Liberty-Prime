@@ -26,6 +26,24 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
+    <ImageButton
+        android:id="@+id/USAUSAUSA"
+        android:paddingLeft="0dp"
+        android:paddingRight="0dp"
+        android:layout_width="65dp"
+        app:srcCompat="@drawable/bosicon"
+        android:adjustViewBounds="false"
+        android:scaleType="fitCenter"
+        android:cropToPadding="true"
+        android:background="@android:color/transparent"
+
+        style="@android:style/Widget.ImageButton"
+        android:layout_height="85dp"
+        android:layout_marginBottom="10dp"
+        android:layout_above="@+id/audioList"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
     <TextView
         android:id="@+id/topLabel_ADVICTORIUM"
         android:maxLines="2"
@@ -41,25 +59,8 @@
         android:layout_height="wrap_content"
         android:lineSpacingExtra="10sp"
         android:layout_width="wrap_content"
-        android:layout_above="@+id/audioList"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="21dp" />
-
-    <ImageButton
-        android:id="@+id/REVOLUTION"
-        android:paddingLeft="0dp"
-        android:paddingRight="0dp"
-        android:layout_width="85dp"
-        app:srcCompat="@drawable/bosicon"
-        android:adjustViewBounds="false"
-        android:scaleType="fitCenter"
-        android:cropToPadding="true"
-        android:background="@android:color/transparent"
-
-        style="@android:style/Widget.ImageButton"
-        android:layout_height="85dp"
-        android:layout_above="@+id/audioList"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_marginTop="14dp"
+        android:layout_alignTop="@+id/USAUSAUSA"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>
