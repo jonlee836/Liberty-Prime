@@ -4,8 +4,8 @@
     android:layout_height="fill_parent"
     android:orientation="vertical"
     >
-    <TextView
-        android:id="@+id/list"
+    <ListView
+        android:id="@+id/menulist"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="30dp"

@@ -8,8 +8,10 @@ import android.media.MediaPlayer;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -17,6 +19,8 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -41,6 +45,7 @@ public class MainActivity extends AppCompatActivity{
     Field UNJUST_TAXATION[];
     MediaPlayer LIBERTY_BELL, OLD_GLORY;
     ImageView USAUSAUSA;
+    ListView menulist;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +72,8 @@ public class MainActivity extends AppCompatActivity{
         ARRAY_OF_FREEDOM.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener(){
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                String audio_filename = ARRAY_OF_LIBERTY[position];
+                Log.v("long clicked",String.valueOf(audio_filename));
 
                 System.out.println("$$$$$$$$$$$$$$$$$$ long click : " + ARRAY_OF_LIBERTY[position]);
                 return false;
@@ -109,6 +116,30 @@ public class MainActivity extends AppCompatActivity{
         });
     }
 
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo){
+        menu.add(v.getId(), 1, 0, "Edit");
+        menu.add(v.getId(), 2, 0, "Delete");
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+
+        AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        String  audio_file_name = (String) ARRAY_OF_FREEDOM.getItemAtPosition(acmi.position);
+        Log.v("long clicked",String.valueOf(audio_file_name));
+
+        switch (item.getItemId()) {
+            case 1:
+                Toast.makeText(getApplicationContext(), "Edit Clicked", Toast.LENGTH_LONG).show();
+                break;
+            case 2:
+                Toast.makeText(getApplicationContext(), "Delete Clicked", Toast.LENGTH_LONG).show();
+                break;
+        }
+        return true;
+    }
+
     public void LET_FREEDOM_RING(){
 
         int currRnd;
@@ -130,7 +161,6 @@ public class MainActivity extends AppCompatActivity{
                 }
             });
         }
-
         UNALIENABLE_RIGHTS();
     }
 
