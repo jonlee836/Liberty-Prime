@@ -1,10 +1,19 @@
 package com.example.nonroot.libertyprime;
 
 import android.app.Activity;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -22,9 +31,16 @@ import android.widget.TextView;
 
 import org.w3c.dom.Text;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Random;
+
+import static android.R.attr.name;
 
 public class MainActivity extends AppCompatActivity{
 
@@ -45,7 +61,7 @@ public class MainActivity extends AppCompatActivity{
     Field UNJUST_TAXATION[];
     MediaPlayer LIBERTY_BELL, OLD_GLORY;
     ImageView USAUSAUSA;
-    ListView menulist;
+    String original[];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +91,6 @@ public class MainActivity extends AppCompatActivity{
                 String audio_filename = ARRAY_OF_LIBERTY[position];
                 Log.v("long clicked",String.valueOf(audio_filename));
 
-                System.out.println("$$$$$$$$$$$$$$$$$$ long click : " + ARRAY_OF_LIBERTY[position]);
                 return false;
             }
 
@@ -118,8 +133,8 @@ public class MainActivity extends AppCompatActivity{
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo){
-        menu.add(v.getId(), 1, 0, "Edit");
-        menu.add(v.getId(), 2, 0, "Delete");
+        menu.add(v.getId(), 1, 0, "SET TO RING TONE");
+        menu.add(v.getId(), 2, 0, "some other option");
     }
 
     @Override
@@ -127,14 +142,85 @@ public class MainActivity extends AppCompatActivity{
 
         AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         String  audio_file_name = (String) ARRAY_OF_FREEDOM.getItemAtPosition(acmi.position);
+
+        String m_str;
+
         Log.v("long clicked",String.valueOf(audio_file_name));
 
         switch (item.getItemId()) {
             case 1:
-                Toast.makeText(getApplicationContext(), "Edit Clicked", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "SET TO RING TONE", Toast.LENGTH_LONG).show();
+                System.out.println("CLICKED RING TONE OPTION");
+
+                Uri rawpath = Uri.parse("android.resource://com.example.nonroot.libertyprime/raw/" + original[acmi.position]);
+                RingtoneManager.setActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_RINGTONE, rawpath);
+                Log.i("TEST", "Ringtone Set to Resource: "+ rawpath.toString());
+                RingtoneManager.getRingtone(getApplicationContext(), rawpath).play();
+
+                String rawName = original[acmi.position];
+
+                if (isExternalStorageWritable() && isExternalStorageReadable()){
+                    String foo = Environment.DIRECTORY_RINGTONES;
+                    System.out.println("DIRECTORY_RINGTONES " + foo);
+
+                    String path = "android.resource://com.example.nonroot.libertyprime/raw/" + rawName;
+//                    System.out.println();
+
+                    File f = new File(path);
+
+                    Uri mUri = Uri.parse("android.resource:///" + getApplication().getPackageName() + "/raw/" + rawName);
+                    System.out.println("mUri = " + mUri.toString());
+                    ContentResolver mCr = getApplicationContext().getContentResolver();
+                    AssetFileDescriptor soundFile;
+
+                    try {
+                        soundFile = mCr.openAssetFileDescriptor(mUri, "r");
+                    } catch (FileNotFoundException e) {
+                        soundFile = null;
+                    }
+
+                    try {
+                        byte[] readData = new byte[1024];
+                        FileInputStream fis = soundFile.createInputStream();
+                        FileOutputStream fos = new FileOutputStream(f);
+                        int i = fis.read(readData);
+
+                        while (i != -1) {
+                            fos.write(readData, 0, i);
+                            i = fis.read(readData);
+                        }
+
+                        fos.close();
+                    } catch (IOException io) {
+                    }
+                    ContentValues values = new ContentValues();
+                    values.put(MediaStore.MediaColumns.DATA, f.getAbsolutePath());
+                    values.put(MediaStore.MediaColumns.TITLE, rawName);
+                    values.put(MediaStore.MediaColumns.MIME_TYPE, "audio/mp3");
+                    values.put(MediaStore.MediaColumns.SIZE, f.length());
+                    values.put(MediaStore.Audio.Media.ARTIST, R.string.app_name);
+                    values.put(MediaStore.Audio.Media.IS_RINGTONE, true);
+                    values.put(MediaStore.Audio.Media.IS_NOTIFICATION, true);
+                    values.put(MediaStore.Audio.Media.IS_ALARM, true);
+                    values.put(MediaStore.Audio.Media.IS_MUSIC, true);
+
+                    Uri uri = MediaStore.Audio.Media.getContentUriForPath(f.getAbsolutePath());
+                    System.out.println("NEW PATH OF MP3 " + uri.toString());
+                    Uri newUri = mCr.insert(uri, values);
+
+                    try {
+                        RingtoneManager.setActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_RINGTONE, newUri);
+                        Settings.System.putString(mCr, Settings.System.RINGTONE, newUri.toString());
+                    } catch (Throwable t) {
+
+                    }
+
+                }
+
                 break;
             case 2:
-                Toast.makeText(getApplicationContext(), "Delete Clicked", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "some other option", Toast.LENGTH_LONG).show();
+                System.out.println("CLICKED OTHER OPTION");
                 break;
         }
         return true;
@@ -257,6 +343,7 @@ public class MainActivity extends AppCompatActivity{
         // audio int rawIDs and strings for viewlist
         ARRAY_OF_DEMOCRACY = new int[BRITISH_TYRANNY];
         ARRAY_OF_LIBERTY = new String[BRITISH_TYRANNY];
+        original = new String[BRITISH_TYRANNY];
 
         // for now it's just 1 min clips of prime marching
         // eventually make the weapons firing and marching random so you get a unique
@@ -274,6 +361,7 @@ public class MainActivity extends AppCompatActivity{
                 }
                 if (i < mrchIndx_Start){
                     ARRAY_OF_LIBERTY[startIndstr] = UNJUST_TAXATION[i].getName();
+                    original[startIndstr] = ARRAY_OF_LIBERTY[startIndstr];
                     ARRAY_OF_LIBERTY[startIndstr] = ARRAY_OF_LIBERTY[startIndstr].toUpperCase();
 
                     if (ARRAY_OF_LIBERTY[startIndstr].equals("COMMUNISM___")){
@@ -324,6 +412,24 @@ public class MainActivity extends AppCompatActivity{
 
         if (a.contains(b)) {
             System.out.println("MATCH     " + a + "   " + b);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            return true;
+        }
+        return false;
+    }
+
+    /* Checks if external storage is available to at least read */
+    public boolean isExternalStorageReadable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state) ||
+                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
             return true;
         }
         return false;
