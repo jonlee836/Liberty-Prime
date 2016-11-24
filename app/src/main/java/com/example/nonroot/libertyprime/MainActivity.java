@@ -8,14 +8,18 @@ import android.media.MediaPlayer;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Toast;
 import android.widget.TextView;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity{
@@ -53,10 +57,22 @@ public class MainActivity extends AppCompatActivity{
         LIVE_FREE_OR_DIE.setStreamVolume(AudioManager.STREAM_MUSIC, 100, 0);
 
         final ArrayAdapter LIBERTY = new ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, ARRAY_OF_LIBERTY);
+
         ARRAY_OF_FREEDOM.setAdapter(LIBERTY);
+        registerForContextMenu(ARRAY_OF_FREEDOM);
 
         LIBERTY_BELL = new MediaPlayer();
         OLD_GLORY = new MediaPlayer();
+
+        ARRAY_OF_FREEDOM.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener(){
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+                System.out.println("$$$$$$$$$$$$$$$$$$ long click : " + ARRAY_OF_LIBERTY[position]);
+                return false;
+            }
+
+        });
 
         ARRAY_OF_FREEDOM.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -105,7 +121,7 @@ public class MainActivity extends AppCompatActivity{
         LIBERTY_BELL = MediaPlayer.create(this, ARRAY_OF_DEMOCRACY[currRnd]);
         LIBERTY_BELL.start();
 
-        // recursively keep playing until bool is set false
+        // recursively keep playing until bool is set false by other onClicks
         if (currRnd < BRITISH_TYRANNY) {
             LIBERTY_BELL.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
@@ -165,6 +181,7 @@ public class MainActivity extends AppCompatActivity{
     public void DECLARE_INDEPENDENCE() {
 
         UNJUST_TAXATION = R.raw.class.getDeclaredFields();
+        BRITISH_TYRANNY = 0;
 
         int startIndstr = 0;
         int mrchIndx_Start = -1;
@@ -186,11 +203,9 @@ public class MainActivity extends AppCompatActivity{
                 }
                 if (Type_Check(str_name, md) == Boolean.TRUE && mrchIndx_Start == -1){
                     mrchIndx_Start = i;
-                    System.out.println("mrchindx : " + mrchIndx_Start);
                 }
                 if (Type_Check(str_name, wd) == Boolean.TRUE && weapIndx_Start == -1){
                     weapIndx_Start = i;
-                    System.out.println("weapindx : " + weapIndx_Start);
                 }
 
                 if (UNJUST_TAXATION[i].getName() == "z_primemarch") {
@@ -204,18 +219,19 @@ public class MainActivity extends AppCompatActivity{
         // marching audio, weapon audio
         ONE_IF_BY_LAND = new int[weapIndx_Start - mrchIndx_Start];
         TWO_IF_BY_SEA = new int[UNJUST_TAXATION.length - weapIndx_Start];
+        BRITISH_TYRANNY -= ONE_IF_BY_LAND.length + TWO_IF_BY_SEA.length;
 
         int foo = weapIndx_Start-mrchIndx_Start;
         int bar = UNJUST_TAXATION.length - weapIndx_Start;
-
-        System.out.println("one if by land size, index : " + foo + " " + mrchIndx_Start);
-        System.out.println("two if by sea size, index : " + bar + " " + weapIndx_Start);
 
         // audio int rawIDs and strings for viewlist
         ARRAY_OF_DEMOCRACY = new int[BRITISH_TYRANNY];
         ARRAY_OF_LIBERTY = new String[BRITISH_TYRANNY];
 
-        // 1 min clips of prime marching
+        // for now it's just 1 min clips of prime marching
+        // eventually make the weapons firing and marching random so you get a unique
+        // experience every time?
+
         try {
 
             int mrchCount = 0;
@@ -235,8 +251,9 @@ public class MainActivity extends AppCompatActivity{
                     }
                     ARRAY_OF_LIBERTY[startIndstr] = ARRAY_OF_LIBERTY[startIndstr].replace("_", " ");
                     ARRAY_OF_DEMOCRACY[startIndstr] = UNJUST_TAXATION[i].getInt(null);
-                }
 
+                    System.out.println(ARRAY_OF_LIBERTY[startIndstr] + " " + startIndstr + " " + ARRAY_OF_DEMOCRACY[startIndstr]);
+                }
 
                 if (i >= mrchIndx_Start && i < weapIndx_Start) {
                     ONE_IF_BY_LAND[mrchCount] = UNJUST_TAXATION[i].getInt(null);
@@ -247,15 +264,13 @@ public class MainActivity extends AppCompatActivity{
                     weapCount++;
                 }
 
-                System.out.println(ARRAY_OF_LIBERTY[startIndstr] + " " + startIndstr + " " + ARRAY_OF_DEMOCRACY[startIndstr]);
-
                 startIndstr++;
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-// test 
+// test
     private Boolean BadStr_check(String a){
 
         // this gets rid of the random crap that is generated when you fill
@@ -266,6 +281,7 @@ public class MainActivity extends AppCompatActivity{
         if (a == "$change" ||
             a == "serialVersionUID") {
 
+            System.out.println("BADSTR_CHECK : " + a);
             return Boolean.FALSE;
         }
         else {

@@ -1,5 +1,13 @@
 <resources>
+    <string name="option_list">OPTIONS</string>
     <string name="app_name">AD VICTORIUM</string>
     <string name="title_label">DEATH TO THE INSTITUTE, AD VICTORIUM</string>
     <string name="background_image">libertyprime_1.jpg</string>
+    
+    <string-array name="menulist">
+        <item>SET AS RING TONE</item>
+        <item>TEXT AUDIO FILE</item>
+        <item>DOWNLOAD</item>
+    </string-array>
+    
 </resources>
