@@ -1,25 +1,16 @@
 package com.example.nonroot.libertyprime;
-
-import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.pm.PackageManager;
-import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-
-import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -28,19 +19,11 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
-
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.Random;
-
-import static android.R.attr.name;
 
 public class MainActivity extends AppCompatActivity{
 
@@ -62,6 +45,8 @@ public class MainActivity extends AppCompatActivity{
     MediaPlayer LIBERTY_BELL, OLD_GLORY;
     ImageView USAUSAUSA;
     String original[];
+
+    private final File folder_ringtones = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_RINGTONES);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -152,69 +137,71 @@ public class MainActivity extends AppCompatActivity{
                 Toast.makeText(getApplicationContext(), "SET TO RING TONE", Toast.LENGTH_LONG).show();
                 System.out.println("CLICKED RING TONE OPTION");
 
-                Uri rawpath = Uri.parse("android.resource://com.example.nonroot.libertyprime/raw/" + original[acmi.position]);
-                RingtoneManager.setActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_RINGTONE, rawpath);
-                Log.i("TEST", "Ringtone Set to Resource: "+ rawpath.toString());
-                RingtoneManager.getRingtone(getApplicationContext(), rawpath).play();
+                //Uri rawpath = Uri.parse("android.resource://com.example.nonroot.libertyprime/raw/" + original[acmi.position]);
+                //RingtoneManager.setActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_RINGTONE, rawpath);
+                //Log.i("TEST", "Ringtone Set to Resource: "+ rawpath.toString());
+                //RingtoneManager.getRingtone(getApplicationContext(), rawpath).play();
 
-                String rawName = original[acmi.position];
+                String foobar = Environment.getExternalStorageDirectory().getPath() + "/media/audio/";
+                System.out.println("TEST PATH : " + foobar);
 
-                if (isExternalStorageWritable() && isExternalStorageReadable()){
-                    String foo = Environment.DIRECTORY_RINGTONES;
-                    System.out.println("DIRECTORY_RINGTONES " + foo);
+                Boolean success = false;
+                String TAG = "foobar";
+                File audio_newpath = new File(folder_ringtones, original[acmi.position]);
 
-                    String path = "android.resource://com.example.nonroot.libertyprime/raw/" + rawName;
-//                    System.out.println();
+                if (isExternalStorageWritable() && isExternalStorageReadable()) {
+                    if (!audio_newpath.exists()) {
+                        Log.i("foo", folder_ringtones.toString());
+                        try {
+                            InputStream in = getResources().openRawResource(ARRAY_OF_DEMOCRACY[acmi.position]);
+                            FileOutputStream out = new FileOutputStream(audio_newpath.getPath());
+                            byte[] buff = new byte[1024];
+                            int read = 0;
 
-                    File f = new File(path);
+                            try {
+                                while ((read = in.read(buff)) > 0) {
+                                    out.write(buff, 0, read);
+                                }
+                            } finally {
+                                in.close();
 
-                    Uri mUri = Uri.parse("android.resource:///" + getApplication().getPackageName() + "/raw/" + rawName);
-                    System.out.println("mUri = " + mUri.toString());
-                    ContentResolver mCr = getApplicationContext().getContentResolver();
-                    AssetFileDescriptor soundFile;
-
-                    try {
-                        soundFile = mCr.openAssetFileDescriptor(mUri, "r");
-                    } catch (FileNotFoundException e) {
-                        soundFile = null;
-                    }
-
-                    try {
-                        byte[] readData = new byte[1024];
-                        FileInputStream fis = soundFile.createInputStream();
-                        FileOutputStream fos = new FileOutputStream(f);
-                        int i = fis.read(readData);
-
-                        while (i != -1) {
-                            fos.write(readData, 0, i);
-                            i = fis.read(readData);
+                                out.close();
+                            }
+                        } catch (Exception e) {
+                            success = false;
+                            Log.i("foo", "Desi Look failed to write.");
                         }
-
-                        fos.close();
-                    } catch (IOException io) {
                     }
-                    ContentValues values = new ContentValues();
-                    values.put(MediaStore.MediaColumns.DATA, f.getAbsolutePath());
-                    values.put(MediaStore.MediaColumns.TITLE, rawName);
-                    values.put(MediaStore.MediaColumns.MIME_TYPE, "audio/mp3");
-                    values.put(MediaStore.MediaColumns.SIZE, f.length());
-                    values.put(MediaStore.Audio.Media.ARTIST, R.string.app_name);
-                    values.put(MediaStore.Audio.Media.IS_RINGTONE, true);
-                    values.put(MediaStore.Audio.Media.IS_NOTIFICATION, true);
-                    values.put(MediaStore.Audio.Media.IS_ALARM, true);
-                    values.put(MediaStore.Audio.Media.IS_MUSIC, true);
+                }
+                else {
+                    success = true;
+                    Log.i(TAG, "Meri Desi Look ringtone already there.");
+                }
 
-                    Uri uri = MediaStore.Audio.Media.getContentUriForPath(f.getAbsolutePath());
-                    System.out.println("NEW PATH OF MP3 " + uri.toString());
-                    Uri newUri = mCr.insert(uri, values);
-
+                if (!success) {
+                    Toast.makeText(getApplicationContext(), "UNABLE TO WRITE AUDIO", Toast.LENGTH_LONG).show();
+                }
+                else {
                     try {
+                        ContentValues values = new ContentValues();
+                        values.put(MediaStore.MediaColumns.DATA, audio_newpath.getAbsolutePath());
+                        values.put(MediaStore.MediaColumns.TITLE, "Meri Desi Look - performed by Sunny Leone");
+                        values.put(MediaStore.MediaColumns.MIME_TYPE, "audio/*");
+                        values.put(MediaStore.Audio.Media.ARTIST, "Meri Desi Look");
+                        values.put(MediaStore.Audio.Media.IS_RINGTONE, true);
+                        values.put(MediaStore.Audio.Media.IS_NOTIFICATION, true);
+                        values.put(MediaStore.Audio.Media.IS_ALARM, true);
+                        values.put(MediaStore.Audio.Media.IS_MUSIC, true);
+
+                        Uri uri = MediaStore.Audio.Media.getContentUriForPath(audio_newpath.getAbsolutePath());
+                        getContentResolver().delete(uri, MediaStore.MediaColumns.DATA + "=\"" + audio_newpath.getAbsolutePath() + "\"",
+                                null);
+                        Uri newUri = getContentResolver().insert(uri, values);
+
                         RingtoneManager.setActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_RINGTONE, newUri);
-                        Settings.System.putString(mCr, Settings.System.RINGTONE, newUri.toString());
-                    } catch (Throwable t) {
-
+                    } catch (Exception e) {
+                        Toast.makeText(getApplicationContext(), "UNABLE TO SET RING TONE", Toast.LENGTH_LONG).show();
                     }
-
                 }
 
                 break;
@@ -268,32 +255,6 @@ public class MainActivity extends AppCompatActivity{
         }
     }
 
-    public void SUCCESSION(){
-        if (GIVE_ME_LIBERTY_OR_GIVE_ME_DEATH == Boolean.TRUE){
-            LIBERTY_BELL.reset();
-            OLD_GLORY.reset();
-
-            BEFORE_1776();
-        }
-    }
-
-    public void BEFORE_1776(){
-        GIVE_ME_LIBERTY_OR_GIVE_ME_DEATH = Boolean.FALSE;
-    }
-
-    public void A_GIANT_MISTAKE(){
-
-    }
-
-    public void AFTER_1776(){
-        GIVE_ME_LIBERTY_OR_GIVE_ME_DEATH = Boolean.TRUE;
-    }
-
-    public void BALANCE_OF_POWER(){
-        LIBERTY_BELL.reset();
-        OLD_GLORY.reset();
-    }
-
     public void DECLARE_INDEPENDENCE() {
 
         UNJUST_TAXATION = R.raw.class.getDeclaredFields();
@@ -337,7 +298,7 @@ public class MainActivity extends AppCompatActivity{
         TWO_IF_BY_SEA = new int[UNJUST_TAXATION.length - weapIndx_Start];
         BRITISH_TYRANNY -= ONE_IF_BY_LAND.length + TWO_IF_BY_SEA.length;
 
-        int foo = weapIndx_Start-mrchIndx_Start;
+        int writepath = weapIndx_Start-mrchIndx_Start;
         int bar = UNJUST_TAXATION.length - weapIndx_Start;
 
         // audio int rawIDs and strings for viewlist
@@ -388,8 +349,32 @@ public class MainActivity extends AppCompatActivity{
             e.printStackTrace();
         }
     }
-// test
-    private Boolean BadStr_check(String a){
+
+    public void SUCCESSION(){
+        if (GIVE_ME_LIBERTY_OR_GIVE_ME_DEATH == Boolean.TRUE){
+            LIBERTY_BELL.reset();
+            OLD_GLORY.reset();
+
+            BEFORE_1776();
+        }
+    }
+
+    public void BEFORE_1776(){
+        GIVE_ME_LIBERTY_OR_GIVE_ME_DEATH = Boolean.FALSE;
+    }
+
+    public void A_GIANT_MISTAKE(){
+
+    }
+
+    public void AFTER_1776(){
+        GIVE_ME_LIBERTY_OR_GIVE_ME_DEATH = Boolean.TRUE;
+    }
+
+    public void BALANCE_OF_POWER(){
+        LIBERTY_BELL.reset();
+        OLD_GLORY.reset();
+    }    private Boolean BadStr_check(String a){
 
         // this gets rid of the random crap that is generated when you fill
         // a Field object made from R.raw.class.getDecalredFields
