@@ -169,7 +169,7 @@ public class MainActivity extends AppCompatActivity{
                             }
                         } catch (Exception e) {
                             success = false;
-                            Log.i("foo", "Desi Look failed to write.");
+                            Log.i("foo", "FAILED TO WRITE.");
                         }
                     }
                 }
@@ -194,9 +194,10 @@ public class MainActivity extends AppCompatActivity{
                         values.put(MediaStore.Audio.Media.IS_MUSIC, true);
 
                         Uri uri = MediaStore.Audio.Media.getContentUriForPath(audio_newpath.getAbsolutePath());
-                        getContentResolver().delete(uri, MediaStore.MediaColumns.DATA + "=\"" + audio_newpath.getAbsolutePath() + "\"",
-                                null);
+                        System.out.println("old uri " + uri);
+                        getContentResolver().delete(uri, MediaStore.MediaColumns.DATA + "=\"" + audio_newpath.getAbsolutePath() + "\"", null);
                         Uri newUri = getContentResolver().insert(uri, values);
+                        System.out.println("new uri " + newUri);
 
                         RingtoneManager.setActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_RINGTONE, newUri);
                     } catch (Exception e) {
@@ -374,7 +375,9 @@ public class MainActivity extends AppCompatActivity{
     public void BALANCE_OF_POWER(){
         LIBERTY_BELL.reset();
         OLD_GLORY.reset();
-    }    private Boolean BadStr_check(String a){
+    }
+
+    private Boolean BadStr_check(String a){
 
         // this gets rid of the random crap that is generated when you fill
         // a Field object made from R.raw.class.getDecalredFields
