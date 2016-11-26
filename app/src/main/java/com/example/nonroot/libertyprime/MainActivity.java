@@ -7,6 +7,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -142,7 +143,10 @@ public class MainActivity extends AppCompatActivity{
                 //Log.i("TEST", "Ringtone Set to Resource: "+ rawpath.toString());
                 //RingtoneManager.getRingtone(getApplicationContext(), rawpath).play();
 
-                String foobar = Environment.getExternalStorageDirectory().getPath() + "/media/audio/";
+                File test =  Environment.getDataDirectory();
+                String testfoo = test.toString();
+                System.out.println("GET DATA DIRECTORY : " + testfoo);
+                String foobar = Environment.getExternalStorageDirectory().getPath();
                 System.out.println("TEST PATH : " + foobar);
 
                 Boolean success = false;
@@ -151,26 +155,47 @@ public class MainActivity extends AppCompatActivity{
 
                 if (isExternalStorageWritable() && isExternalStorageReadable()) {
                     if (!audio_newpath.exists()) {
-                        Log.i("foo", folder_ringtones.toString());
+                        // this exists
+                        Log.i("foo", audio_newpath.toString());
+                        System.out.println("NEW PATH FOR RAW FILE VALID!");
+
                         try {
                             InputStream in = getResources().openRawResource(ARRAY_OF_DEMOCRACY[acmi.position]);
+                            System.out.println(" RAW ID VALUE : " + ARRAY_OF_DEMOCRACY[acmi.position]);
                             FileOutputStream out = new FileOutputStream(audio_newpath.getPath());
                             byte[] buff = new byte[1024];
-                            int read = 0;
-
-                            try {
-                                while ((read = in.read(buff)) > 0) {
-                                    out.write(buff, 0, read);
+//                            int read = -1;
+//                            try {
+//                                while ((read = in.read(buff)) > 0) {
+//                                    out.write(buff, 0, read);
+//                                }
+//                            }
+                            try{
+                                int i = in.read(buff);
+                                while (i != -1) {
+                                    out.write(buff, 0, i);
+                                    i = in.read(buff);
                                 }
-                            } finally {
+                            }
+                            finally {
                                 in.close();
-
                                 out.close();
                             }
-                        } catch (Exception e) {
+                        }
+//                            int i = fis.read(readData);
+//
+//                            while (i != -1) {
+//                                fos.write(readData, 0, i);
+//                                i = fis.read(readData);
+//                            }
+                        catch (Exception e) {
                             success = false;
+
                             Log.i("foo", "FAILED TO WRITE.");
                         }
+                    }
+                    else{
+                        System.out.println("RAW FILE NOT FOUND");
                     }
                 }
                 else {
