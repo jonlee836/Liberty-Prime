@@ -1,6 +1,7 @@
 package com.example.nonroot.libertyprime;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
@@ -21,7 +22,9 @@ import android.widget.ListView;
 import android.widget.Toast;
 import android.widget.TextView;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.Random;
@@ -47,8 +50,8 @@ public class MainActivity extends AppCompatActivity{
     ImageView USAUSAUSA;
     String original[];
 
-    private final File folder_ringtones = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_RINGTONES);
-
+    //private final File folder_ringtones = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_RINGTONES);
+    //private final String folder_ringtones = (String.valueOf(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_RINGTONES))) + "/";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -128,79 +131,88 @@ public class MainActivity extends AppCompatActivity{
 
         AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         String  audio_file_name = (String) ARRAY_OF_FREEDOM.getItemAtPosition(acmi.position);
-
-        String m_str;
+        int acmi_pos = acmi.position;
+        saveas(item, RingtoneManager.TYPE_RINGTONE, acmi_pos);
 
         Log.v("long clicked",String.valueOf(audio_file_name));
+        return false;
+    }
+
+    public boolean saveas(MenuItem item, int type, int acmi) {
 
         switch (item.getItemId()) {
             case 1:
                 Toast.makeText(getApplicationContext(), "SET TO RING TONE", Toast.LENGTH_LONG).show();
                 System.out.println("CLICKED RING TONE OPTION");
 
-                //Uri rawpath = Uri.parse("android.resource://com.example.nonroot.libertyprime/raw/" + original[acmi.position]);
-                //RingtoneManager.setActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_RINGTONE, rawpath);
-                //Log.i("TEST", "Ringtone Set to Resource: "+ rawpath.toString());
-                //RingtoneManager.getRingtone(getApplicationContext(), rawpath).play();
+//                Uri rawpath = Uri.parse("android.resource://com.example.nonroot.libertyprime/raw/" + original[acmi]);
+//                RingtoneManager.setActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_RINGTONE, rawpath);
+//                Log.i("TEST", "Ringtone Set to Resource: "+ rawpath.toString());
+//                RingtoneManager.getRingtone(getApplicationContext(), rawpath).play();
 
-                File test =  Environment.getDataDirectory();
-                String testfoo = test.toString();
-                System.out.println("GET DATA DIRECTORY : " + testfoo);
-                String foobar = Environment.getExternalStorageDirectory().getPath();
-                System.out.println("TEST PATH : " + foobar);
+//                File test =  Environment.getDataDirectory();
+//                String testfoo = test.toString();
+//                System.out.println("GET DATA DIRECTORY : " + testfoo);
+//                String foobar = Environment.getExternalStorageDirectory().getPath();
+//                System.out.println("TEST PATH : " + foobar);
+
 
                 Boolean success = false;
                 String TAG = "foobar";
-                File audio_newpath = new File(folder_ringtones, original[acmi.position]);
+                int rawID = ARRAY_OF_DEMOCRACY[acmi];
+                String filename = original[acmi];
+                String folder_ringtones = Environment.getExternalStorageDirectory().getAbsolutePath() + "/libertyprime/";
 
-                if (isExternalStorageWritable() && isExternalStorageReadable()) {
-                    if (!audio_newpath.exists()) {
-                        // this exists
-                        Log.i("foo", audio_newpath.toString());
-                        System.out.println("NEW PATH FOR RAW FILE VALID!");
+//                Uri path = Uri.parse(original[acmi]);
+//                RingtoneManager.setActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_RINGTONE, path);
+//                Log .i("TEST", "Ringtone Set to Resource: "+ path.toString());
+//                RingtoneManager.getRingtone(getApplicationContext(), path).play();
 
-                        try {
-                            InputStream in = getResources().openRawResource(ARRAY_OF_DEMOCRACY[acmi.position]);
-                            System.out.println(" RAW ID VALUE : " + ARRAY_OF_DEMOCRACY[acmi.position]);
-                            FileOutputStream out = new FileOutputStream(audio_newpath.getPath());
-                            byte[] buff = new byte[1024];
-//                            int read = -1;
-//                            try {
-//                                while ((read = in.read(buff)) > 0) {
-//                                    out.write(buff, 0, read);
-//                                }
-//                            }
-                            try{
-                                int i = in.read(buff);
-                                while (i != -1) {
-                                    out.write(buff, 0, i);
-                                    i = in.read(buff);
-                                }
-                            }
-                            finally {
-                                in.close();
-                                out.close();
-                            }
-                        }
-//                            int i = fis.read(readData);
-//
-//                            while (i != -1) {
-//                                fos.write(readData, 0, i);
-//                                i = fis.read(readData);
-//                            }
-                        catch (Exception e) {
-                            success = false;
+                byte[] buffer = null;
+                InputStream fIn = getBaseContext().getResources().openRawResource(rawID);
+                int size = 0;
 
-                            Log.i("foo", "FAILED TO WRITE.");
-                        }
-                    }
-                    else{
-                        System.out.println("RAW FILE NOT FOUND");
-                    }
+                try {
+                    size = fIn.available();
+                    buffer = new byte[size];
+                    System.out.println("buffer size " + size);
+
+                    fIn.read(buffer);
+                    fIn.close();
+
+                    System.out.println("INPUT STREAM AVAILABLE " + fIn.toString());
+                } catch (IOException e) {
+                    return false;
                 }
-                else {
+
+                String filelist[] = fileList();
+                System.out.println("SIZE OF FILE LIST : " + filelist.length);
+                System.out.println("CONTENTS OF FILE LIST : " + filelist[0]);
+                boolean exists = (new File(folder_ringtones)).exists();
+
+                if (!exists) {
+                    System.out.println("FOLDER DOES NOT EXIST, CREATING FOLDER " + folder_ringtones);
+
+                    new File(folder_ringtones).mkdirs();
+                }
+
+                FileOutputStream save;
+
+                try {
+                    filename = ARRAY_OF_LIBERTY[acmi].toLowerCase();
+                    System.out.println("FILE NAME : " + filename.toString());
+                    save = new FileOutputStream(folder_ringtones + filename + ".mp3");
+                    save.write(buffer);
+                    save.flush();
+                    save.close();
+                    System.out.println("OUTPUT STREAM " + folder_ringtones + filename);
                     success = true;
-                    Log.i(TAG, "Meri Desi Look ringtone already there.");
+                } catch (FileNotFoundException e) {
+                    System.out.println("FILE FAILED TO WRITE " + folder_ringtones + filename);
+                    return false;
+                } catch (IOException e) {
+                    System.out.println("IO ERROR FAILED TO WRITE " + folder_ringtones + filename);
+                    return false;
                 }
 
                 if (!success) {
@@ -208,28 +220,34 @@ public class MainActivity extends AppCompatActivity{
                 }
                 else {
                     try {
+
+                        sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" + folder_ringtones + filename + ".mp3" + Environment.getExternalStorageDirectory())));
+                        File k = new File(folder_ringtones, filename);
+
                         ContentValues values = new ContentValues();
-                        values.put(MediaStore.MediaColumns.DATA, audio_newpath.getAbsolutePath());
-                        values.put(MediaStore.MediaColumns.TITLE, "Meri Desi Look - performed by Sunny Leone");
-                        values.put(MediaStore.MediaColumns.MIME_TYPE, "audio/*");
-                        values.put(MediaStore.Audio.Media.ARTIST, "Meri Desi Look");
+                        values.put(MediaStore.MediaColumns.DATA, folder_ringtones + filename);
+                        values.put(MediaStore.MediaColumns.TITLE, filename);
+                        values.put(MediaStore.MediaColumns.MIME_TYPE, "audio/mp3");
+                        values.put(MediaStore.Audio.Media.ARTIST, "LIBERTY PRIME");
+
                         values.put(MediaStore.Audio.Media.IS_RINGTONE, true);
-                        values.put(MediaStore.Audio.Media.IS_NOTIFICATION, true);
-                        values.put(MediaStore.Audio.Media.IS_ALARM, true);
-                        values.put(MediaStore.Audio.Media.IS_MUSIC, true);
+                        values.put(MediaStore.Audio.Media.IS_NOTIFICATION, false);
+                        values.put(MediaStore.Audio.Media.IS_ALARM, false);
+                        values.put(MediaStore.Audio.Media.IS_MUSIC, false);
 
-                        Uri uri = MediaStore.Audio.Media.getContentUriForPath(audio_newpath.getAbsolutePath());
-                        System.out.println("old uri " + uri);
-                        getContentResolver().delete(uri, MediaStore.MediaColumns.DATA + "=\"" + audio_newpath.getAbsolutePath() + "\"", null);
-                        Uri newUri = getContentResolver().insert(uri, values);
-                        System.out.println("new uri " + newUri);
-
-                        RingtoneManager.setActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_RINGTONE, newUri);
-                    } catch (Exception e) {
+//                        Uri uri = MediaStore.Audio.Media.getContentUriForPath(audio_newpath.getAbsolutePath());
+//                        System.out.println("old uri " + uri);
+//                        getContentResolver().delete(uri, MediaStore.MediaColumns.DATA + "=\"" + audio_newpath.getAbsolutePath() + "\"", null);
+//                        Uri newUri = getContentResolver().insert(uri, values);
+//                        System.out.println("new uri " + newUri);
+                        Uri newUri = this.getContentResolver().insert(MediaStore.Audio.Media.getContentUriForPath(k.getAbsolutePath()), values);
+                        RingtoneManager.setActualDefaultRingtoneUri(MainActivity.this, RingtoneManager.TYPE_RINGTONE, newUri);
+//                        //RingtoneManager.setActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_RINGTONE, newUri);
+                    }
+                    catch (Exception e) {
                         Toast.makeText(getApplicationContext(), "UNABLE TO SET RING TONE", Toast.LENGTH_LONG).show();
                     }
                 }
-
                 break;
             case 2:
                 Toast.makeText(getApplicationContext(), "some other option", Toast.LENGTH_LONG).show();
