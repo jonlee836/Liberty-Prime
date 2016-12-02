@@ -28,12 +28,15 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.Random;
 
+// Source code for the Liberty Prime sound board.
+// All variable names are intentional for obvious reasons.
+
 public class MainActivity extends AppCompatActivity{
 
     Boolean GIVE_ME_LIBERTY_OR_GIVE_ME_DEATH = Boolean.TRUE;
 
-    int AD_VICTORIAM, PRICE_OF_FREEDOM, BRITISH_TYRANNY;
-
+    Field UNJUST_TAXATION[];
+    
     int ONE_IF_BY_LAND[];
     int TWO_IF_BY_SEA[];
 
@@ -44,10 +47,11 @@ public class MainActivity extends AppCompatActivity{
     TextView SHALL_NOT_BE_INFRINGED;
 
     AudioManager LIVE_FREE_OR_DIE;
-    Field UNJUST_TAXATION[];
     MediaPlayer LIBERTY_BELL, OLD_GLORY;
     ImageView USAUSAUSA;
-    String original[];
+    String UNCHANGED[];
+
+    int AD_VICTORIAM, PRICE_OF_FREEDOM, BRITISH_TYRANNY;
 
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {
@@ -60,67 +64,70 @@ public class MainActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        WE_THE_PEOPLE(this);
-        DECLARE_INDEPENDENCE();
-        MANIFEST_DESTINY();
-        
-        USAUSAUSA = (ImageView) findViewById(R.id.USAUSAUSA);
-        ARRAY_OF_FREEDOM = (ListView) findViewById(R.id.audioList);
-        SHALL_NOT_BE_INFRINGED = (TextView) findViewById(R.id.topLabel_ADVICTORIUM);
+        if (savedInstanceState == null){
 
-        LIVE_FREE_OR_DIE = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        LIVE_FREE_OR_DIE.setStreamVolume(AudioManager.STREAM_MUSIC, 100, 0);
+            WE_THE_PEOPLE(this);
+            DECLARE_INDEPENDENCE();
+            MANIFEST_DESTINY();
 
-        final ArrayAdapter LIBERTY = new ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, ARRAY_OF_LIBERTY);
+            USAUSAUSA = (ImageView) findViewById(R.id.USAUSAUSA);
+            ARRAY_OF_FREEDOM = (ListView) findViewById(R.id.audioList);
+            SHALL_NOT_BE_INFRINGED = (TextView) findViewById(R.id.topLabel_ADVICTORIUM);
 
-        ARRAY_OF_FREEDOM.setAdapter(LIBERTY);
-        registerForContextMenu(ARRAY_OF_FREEDOM);
+            LIVE_FREE_OR_DIE = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+            LIVE_FREE_OR_DIE.setStreamVolume(AudioManager.STREAM_MUSIC, 100, 0);
 
-        LIBERTY_BELL = new MediaPlayer();
-        OLD_GLORY = new MediaPlayer();
+            final ArrayAdapter LIBERTY = new ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, ARRAY_OF_LIBERTY);
 
-        ARRAY_OF_FREEDOM.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener(){
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                String audio_filename = ARRAY_OF_LIBERTY[position];
-                Log.v("long clicked",String.valueOf(audio_filename));
+            ARRAY_OF_FREEDOM.setAdapter(LIBERTY);
+            registerForContextMenu(ARRAY_OF_FREEDOM);
 
-                return false;
-            }
+            LIBERTY_BELL = new MediaPlayer();
+            OLD_GLORY = new MediaPlayer();
 
-        });
+            ARRAY_OF_FREEDOM.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                @Override
+                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                    String audio_filename = ARRAY_OF_LIBERTY[position];
+                    Log.v("long clicked", String.valueOf(audio_filename));
 
-        ARRAY_OF_FREEDOM.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
-                SUCCESSION();
-                COLONIES(ARRAY_OF_DEMOCRACY[position]);
-
-                BEFORE_1776();
-            }
-        });
-
-        SHALL_NOT_BE_INFRINGED.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SUCCESSION();
-                UNALIENABLE_RIGHTS();
-
-                BEFORE_1776();
-            }
-        });
-
-        USAUSAUSA.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                AFTER_1776();
-                BALANCE_OF_POWER();
-
-                if (!LIBERTY_BELL.isPlaying()){
-                    LET_FREEDOM_RING();
+                    return false;
                 }
-            }
-        });
+
+            });
+
+            ARRAY_OF_FREEDOM.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
+                    SUCCESSION();
+                    COLONIES(ARRAY_OF_DEMOCRACY[position]);
+
+                    BEFORE_1776();
+                }
+            });
+
+            SHALL_NOT_BE_INFRINGED.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    SUCCESSION();
+                    UNALIENABLE_RIGHTS();
+
+                    BEFORE_1776();
+                }
+            });
+
+            USAUSAUSA.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    AFTER_1776();
+                    BALANCE_OF_POWER();
+
+                    if (!LIBERTY_BELL.isPlaying()) {
+                        LET_FREEDOM_RING();
+                    }
+                }
+            });
+        }
     }
 
     @Override
@@ -164,100 +171,10 @@ public class MainActivity extends AppCompatActivity{
         }
     }
 
-    public boolean saveas(MenuItem item, int acmi, String a) {
-
-        switch (item.getItemId()) {
-            case 1:
-                InputStream fIn = getBaseContext().getResources().openRawResource(ARRAY_OF_DEMOCRACY[acmi]);
-
-                String PATRIOT = ARRAY_OF_LIBERTY[acmi];
-                File INDEPENDENCE = new File(Environment.getExternalStorageDirectory()+"/LibertyPrime");
-                String SOUND_OF_LIBERTY = INDEPENDENCE.getPath() + "/" + PATRIOT + ".mp3";
-
-                boolean exists = (new File(SOUND_OF_LIBERTY.toString())).exists();
-                if(!exists && isExternalStorageWritable() && isExternalStorageReadable()){
-                    byte[] buffer = null;
-                    int size = 0;
-
-                    try {
-                        size = fIn.available();
-                        buffer = new byte[size];
-                        System.out.println("buffer size " + size);
-
-                        fIn.read(buffer);
-                        fIn.close();
-
-                        System.out.println("INPUT STREAM AVAILABLE " + fIn.toString());
-                    } catch (IOException e) {
-                        return false;
-                    }
-
-                    FileOutputStream save;
-
-                    try {
-                        System.out.println("FILE PATH + NAME : " + SOUND_OF_LIBERTY);
-
-                        save = new FileOutputStream(SOUND_OF_LIBERTY);
-
-                        save.write(buffer);
-                        save.flush();
-                        save.close();
-
-                    } catch (FileNotFoundException e) {
-                        System.out.println("FILE FAILED TO WRITE " + SOUND_OF_LIBERTY);
-                    } catch (IOException e) {
-                        System.out.println("IO ERROR FAILED TO WRITE " + SOUND_OF_LIBERTY);
-                    }
-                }
-
-                // Not sure why I can't directly set the ringtone after downloading.
-                setRingtone(INDEPENDENCE, PATRIOT);
-
-                break;
-            case 2:
-                Toast.makeText(getApplicationContext(), "some other option", Toast.LENGTH_LONG).show();
-                System.out.println("CLICKED OTHER OPTION");
-                break;
-        }
-        return true;
-    }
-
-    public void setRingtone(File INDEPENDENCE, String PATRIOT){
-        try {
-            File k = new File(INDEPENDENCE, PATRIOT);
-
-            ContentValues contentValues = new ContentValues();
-            contentValues.put("_data", k.getAbsolutePath());
-            contentValues.put("title", PATRIOT);
-            contentValues.put("mime_type", "audio/mp3");
-            contentValues.put("_size", Long.valueOf(k.length()));
-            contentValues.put("artist", Integer.valueOf(R.string.app_name));
-            contentValues.put("is_ringtone", Boolean.valueOf(true));
-            contentValues.put("is_notification", Boolean.valueOf(true));
-            contentValues.put("is_alarm", Boolean.valueOf(false));
-            contentValues.put("is_music", Boolean.valueOf(false));
-
-            try {
-                //Uri parse = Uri.parse(this.PATH_TO_FREEDOM);
-                //ContentResolver contentResolver = getContentResolver();
-                //RingtoneManager.setActualDefaultRingtoneUri(getBaseContext(), 1, contentResolver.insert(MediaStore.Audio.Media.getContentUriForPath(k.getAbsolutePath()), contentValues));
-                //sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse(SOUND_OF_LIBERTY)));
-                System.out.println("working!");
-                Toast.makeText(this, new StringBuilder().append("Downloaded as Ringtone!"), Toast.LENGTH_LONG).show();
-
-            } catch (Throwable th) {
-                System.out.println("NOT WORKING");
-                Toast.makeText(this, new StringBuilder().append("Ringtone feature is not working"), Toast.LENGTH_LONG).show();
-            }
-        }
-        catch (Throwable t) {
-            Log.d("test", "FILE NOT FOUND, THIS IS AFTER IT WAS WRITTEN TO STORAGE");
-        }
-    }
-
     public void LET_FREEDOM_RING(){
 
         if (GIVE_ME_LIBERTY_OR_GIVE_ME_DEATH) {
+
             int currRnd;
             do {
                 currRnd = new Random().nextInt(ARRAY_OF_DEMOCRACY.length);
@@ -277,7 +194,11 @@ public class MainActivity extends AppCompatActivity{
                     }
                 });
             }
-            UNALIENABLE_RIGHTS();
+
+            if (!OLD_GLORY.isPlaying()) {
+                UNALIENABLE_RIGHTS();
+            }
+
         }
     }
 
@@ -308,7 +229,7 @@ public class MainActivity extends AppCompatActivity{
         int mrchIndx_Start = -1;
         int weapIndx_Start = -1;
 
-        // Bug? A "$change" string will appear if you're using the instant run feature.
+        // "$change" will appear if you're using the instant run feature.
         // 11/16/2016 : Found a string at Field[49] named "SerialVersionUID" which had an R.raw
         // value of 0.
 
@@ -348,11 +269,11 @@ public class MainActivity extends AppCompatActivity{
         // audio int rawIDs and strings for viewlist
         ARRAY_OF_DEMOCRACY = new int[BRITISH_TYRANNY];
         ARRAY_OF_LIBERTY = new String[BRITISH_TYRANNY];
-        original = new String[BRITISH_TYRANNY];
+        UNCHANGED = new String[BRITISH_TYRANNY];
 
         // for now it's just 1 min clips of prime marching
-        // eventually make the weapons firing and marching random so you get a unique
-        // experience every time?
+        // eventually i'll make the gun fire and marching random so you get a unique
+        // experience every time.
 
         try {
 
@@ -366,7 +287,7 @@ public class MainActivity extends AppCompatActivity{
                 }
                 if (i < mrchIndx_Start){
                     ARRAY_OF_LIBERTY[startIndstr] = UNJUST_TAXATION[i].getName();
-                    original[startIndstr] = ARRAY_OF_LIBERTY[startIndstr];
+                    UNCHANGED[startIndstr] = ARRAY_OF_LIBERTY[startIndstr];
                     ARRAY_OF_LIBERTY[startIndstr] = ARRAY_OF_LIBERTY[startIndstr].toUpperCase();
 
                     if (ARRAY_OF_LIBERTY[startIndstr].equals("COMMUNISM___")){
@@ -461,4 +382,96 @@ public class MainActivity extends AppCompatActivity{
         }
         return false;
     }
+
+    public boolean saveas(MenuItem item, int acmi, String a) {
+
+        switch (item.getItemId()) {
+            case 1:
+                InputStream fIn = getBaseContext().getResources().openRawResource(ARRAY_OF_DEMOCRACY[acmi]);
+
+                String PATRIOT = ARRAY_OF_LIBERTY[acmi];
+                File INDEPENDENCE = new File(Environment.getExternalStorageDirectory()+"/LibertyPrime");
+                String SOUND_OF_LIBERTY = INDEPENDENCE.getPath() + "/" + PATRIOT;
+
+                boolean exists = (new File(SOUND_OF_LIBERTY.toString())).exists();
+                if(!exists && isExternalStorageWritable() && isExternalStorageReadable()){
+                    byte[] buffer = null;
+                    int size = 0;
+
+                    try {
+                        size = fIn.available();
+                        buffer = new byte[size];
+                        System.out.println("buffer size " + size);
+
+                        fIn.read(buffer);
+                        fIn.close();
+
+                        System.out.println("INPUT STREAM AVAILABLE " + fIn.toString());
+                    } catch (IOException e) {
+                        return false;
+                    }
+
+                    FileOutputStream save;
+
+                    try {
+                        System.out.println("FILE PATH + NAME : " + SOUND_OF_LIBERTY);
+
+                        save = new FileOutputStream(SOUND_OF_LIBERTY);
+
+                        save.write(buffer);
+                        save.flush();
+                        save.close();
+
+                    } catch (FileNotFoundException e) {
+                        System.out.println("FILE FAILED TO WRITE " + SOUND_OF_LIBERTY);
+                    } catch (IOException e) {
+                        System.out.println("IO ERROR FAILED TO WRITE " + SOUND_OF_LIBERTY);
+                    }
+                }
+
+                // Not sure why I can't directly set the ringtone after downloading.
+                setRingtone(INDEPENDENCE, PATRIOT);
+
+                break;
+            case 2:
+                Toast.makeText(getApplicationContext(), "some other option", Toast.LENGTH_LONG).show();
+                System.out.println("CLICKED OTHER OPTION");
+                break;
+        }
+        return true;
+    }
+
+    public void setRingtone(File INDEPENDENCE, String PATRIOT){
+        try {
+            File k = new File(INDEPENDENCE, PATRIOT);
+
+            ContentValues contentValues = new ContentValues();
+            contentValues.put("_data", k.getAbsolutePath());
+            contentValues.put("title", PATRIOT);
+            contentValues.put("mime_type", "audio/mp3");
+            contentValues.put("_size", Long.valueOf(k.length()));
+            contentValues.put("artist", Integer.valueOf(R.string.app_name));
+            contentValues.put("is_ringtone", Boolean.valueOf(true));
+            contentValues.put("is_notification", Boolean.valueOf(true));
+            contentValues.put("is_alarm", Boolean.valueOf(false));
+            contentValues.put("is_music", Boolean.valueOf(false));
+
+            try {
+                //Uri parse = Uri.parse(this.PATH_TO_FREEDOM);
+                //ContentResolver contentResolver = getContentResolver();
+                //RingtoneManager.setActualDefaultRingtoneUri(getBaseContext(), 1, contentResolver.insert(MediaStore.Audio.Media.getContentUriForPath(k.getAbsolutePath()), contentValues));
+                //sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse(SOUND_OF_LIBERTY)));
+                System.out.println("working!");
+                Toast.makeText(this, new StringBuilder().append("Downloaded as Ringtone!"), Toast.LENGTH_LONG).show();
+
+            } catch (Throwable th) {
+                System.out.println("NOT WORKING");
+                Toast.makeText(this, new StringBuilder().append("Ringtone feature is not working"), Toast.LENGTH_LONG).show();
+            }
+        }
+        catch (Throwable t) {
+            Log.d("test", "FILE NOT FOUND, THIS IS AFTER IT WAS WRITTEN TO STORAGE");
+        }
+    }
+
 }
