@@ -49,8 +49,6 @@ public class MainActivity extends AppCompatActivity{
     ImageView USAUSAUSA;
     String original[];
 
-    String PATH_TO_FREEDOM ="android.resource://"+R.raw.class.getPackage().toString();
-
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -99,7 +97,6 @@ public class MainActivity extends AppCompatActivity{
                 COLONIES(ARRAY_OF_DEMOCRACY[position]);
 
                 BEFORE_1776();
-                A_GIANT_MISTAKE();
             }
         });
 
@@ -110,7 +107,6 @@ public class MainActivity extends AppCompatActivity{
                 UNALIENABLE_RIGHTS();
 
                 BEFORE_1776();
-                A_GIANT_MISTAKE();
             }
         });
 
@@ -172,12 +168,11 @@ public class MainActivity extends AppCompatActivity{
 
         switch (item.getItemId()) {
             case 1:
-                System.out.println("PATH TO FREEDOM " + PATH_TO_FREEDOM);
                 InputStream fIn = getBaseContext().getResources().openRawResource(ARRAY_OF_DEMOCRACY[acmi]);
 
                 String PATRIOT = ARRAY_OF_LIBERTY[acmi];
                 File INDEPENDENCE = new File(Environment.getExternalStorageDirectory()+"/LibertyPrime");
-                String SOUND_OF_LIBERTY = INDEPENDENCE.getPath() + "/" + PATRIOT;
+                String SOUND_OF_LIBERTY = INDEPENDENCE.getPath() + "/" + PATRIOT + ".mp3";
 
                 boolean exists = (new File(SOUND_OF_LIBERTY.toString())).exists();
                 if(!exists && isExternalStorageWritable() && isExternalStorageReadable()){
@@ -215,37 +210,8 @@ public class MainActivity extends AppCompatActivity{
                     }
                 }
 
-                try {
-                    File k = new File(INDEPENDENCE, PATRIOT);
-
-                    ContentValues contentValues = new ContentValues();
-                    contentValues.put("_data", k.getAbsolutePath());
-                    contentValues.put("title", PATRIOT);
-                    contentValues.put("mime_type", "audio/mp3");
-                    contentValues.put("_size", Long.valueOf(k.length()));
-                    contentValues.put("artist", Integer.valueOf(R.string.app_name));
-                    contentValues.put("is_ringtone", Boolean.valueOf(true));
-                    contentValues.put("is_notification", Boolean.valueOf(true));
-                    contentValues.put("is_alarm", Boolean.valueOf(false));
-                    contentValues.put("is_music", Boolean.valueOf(false));
-
-                    try {
-                        // No clue why I can't set it as a ringtone.
-                        //Uri parse = Uri.parse(this.PATH_TO_FREEDOM);
-                        //ContentResolver contentResolver = getContentResolver();
-                        //RingtoneManager.setActualDefaultRingtoneUri(getBaseContext(), 1, contentResolver.insert(MediaStore.Audio.Media.getContentUriForPath(k.getAbsolutePath()), contentValues));
-                        //sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse(SOUND_OF_LIBERTY)));
-                        System.out.println("working!");
-                        Toast.makeText(this, new StringBuilder().append("Downloaded as Ringtone!"), Toast.LENGTH_LONG).show();
-
-                    } catch (Throwable th) {
-                        System.out.println("NOT WORKING");
-                        Toast.makeText(this, new StringBuilder().append("Ringtone feature is not working"), Toast.LENGTH_LONG).show();
-                    }
-                }
-                catch (Throwable t) {
-                    Log.d("test", "FILE NOT FOUND, THIS IS AFTER IT WAS WRITTEN TO STORAGE");
-                }
+                // Not sure why I can't directly set the ringtone after downloading.
+                setRingtone(INDEPENDENCE, PATRIOT);
 
                 break;
             case 2:
@@ -254,6 +220,39 @@ public class MainActivity extends AppCompatActivity{
                 break;
         }
         return true;
+    }
+
+    public void setRingtone(File INDEPENDENCE, String PATRIOT){
+        try {
+            File k = new File(INDEPENDENCE, PATRIOT);
+
+            ContentValues contentValues = new ContentValues();
+            contentValues.put("_data", k.getAbsolutePath());
+            contentValues.put("title", PATRIOT);
+            contentValues.put("mime_type", "audio/mp3");
+            contentValues.put("_size", Long.valueOf(k.length()));
+            contentValues.put("artist", Integer.valueOf(R.string.app_name));
+            contentValues.put("is_ringtone", Boolean.valueOf(true));
+            contentValues.put("is_notification", Boolean.valueOf(true));
+            contentValues.put("is_alarm", Boolean.valueOf(false));
+            contentValues.put("is_music", Boolean.valueOf(false));
+
+            try {
+                //Uri parse = Uri.parse(this.PATH_TO_FREEDOM);
+                //ContentResolver contentResolver = getContentResolver();
+                //RingtoneManager.setActualDefaultRingtoneUri(getBaseContext(), 1, contentResolver.insert(MediaStore.Audio.Media.getContentUriForPath(k.getAbsolutePath()), contentValues));
+                //sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse(SOUND_OF_LIBERTY)));
+                System.out.println("working!");
+                Toast.makeText(this, new StringBuilder().append("Downloaded as Ringtone!"), Toast.LENGTH_LONG).show();
+
+            } catch (Throwable th) {
+                System.out.println("NOT WORKING");
+                Toast.makeText(this, new StringBuilder().append("Ringtone feature is not working"), Toast.LENGTH_LONG).show();
+            }
+        }
+        catch (Throwable t) {
+            Log.d("test", "FILE NOT FOUND, THIS IS AFTER IT WAS WRITTEN TO STORAGE");
+        }
     }
 
     public void LET_FREEDOM_RING(){
@@ -406,10 +405,6 @@ public class MainActivity extends AppCompatActivity{
 
     public void BEFORE_1776(){
         GIVE_ME_LIBERTY_OR_GIVE_ME_DEATH = Boolean.FALSE;
-    }
-
-    public void A_GIANT_MISTAKE(){
-
     }
 
     public void AFTER_1776(){
