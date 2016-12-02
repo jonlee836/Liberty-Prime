@@ -41,9 +41,9 @@ public class MainActivity extends AppCompatActivity{
     int TWO_IF_BY_SEA[];
 
     int ARRAY_OF_DEMOCRACY[];
-
     String ARRAY_OF_LIBERTY[];
     ListView ARRAY_OF_FREEDOM;
+
     TextView SHALL_NOT_BE_INFRINGED;
 
     AudioManager LIVE_FREE_OR_DIE;
