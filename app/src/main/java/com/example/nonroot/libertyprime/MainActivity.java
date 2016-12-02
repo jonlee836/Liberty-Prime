@@ -5,6 +5,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.UriMatcher;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -34,6 +35,8 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.Random;
 
+import static android.R.attr.networkSecurityConfig;
+import static android.R.attr.path;
 import static android.R.id.content;
 import static android.os.Environment.DIRECTORY_MUSIC;
 import static android.os.Environment.DIRECTORY_RINGTONES;
@@ -233,41 +236,56 @@ public class MainActivity extends AppCompatActivity{
 
                     try {
                         //sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse(SOUND_OF_LIBERTY)));
-                        File k = new File(SOUND_OF_LIBERTY);
+                        File k = new File(CONTINENTAL, PATRIOT);
 
                         ContentValues values = new ContentValues();
-                        values.put(MediaStore.MediaColumns.DATA, SOUND_OF_LIBERTY);
+                        values.put(MediaStore.MediaColumns.DATA, k.getAbsolutePath());
                         values.put(MediaStore.MediaColumns.TITLE, PATRIOT);
+
                         values.put(MediaStore.MediaColumns.MIME_TYPE, "audio/mp3");
-                        values.put(MediaStore.Audio.Media.ARTIST, "LIBERTY PRIME");
 
                         values.put(MediaStore.Audio.Media.IS_RINGTONE, true);
-                        values.put(MediaStore.Audio.Media.IS_NOTIFICATION, false);
-                        values.put(MediaStore.Audio.Media.IS_ALARM, false);
+                        values.put(MediaStore.Audio.Media.IS_NOTIFICATION, true);
+                        values.put(MediaStore.Audio.Media.IS_ALARM, true);
                         values.put(MediaStore.Audio.Media.IS_MUSIC, true);
 
-//                        Uri uri = MediaStore.Audio.Media.getContentUriForPath(k.getAbsolutePath());
-//                        System.out.println("old uri " + uri);
-//                        Uri newUri = getContentResolver().insert(uri, values);
-//                        System.out.println("new uri " + newUri);
-//                        Uri Ringtone1 = Uri.parse("current song file path");
-                        //Insert it into the database
-
+                        //Uri uri = MediaStore.Audio.Media.getContentUriForPath(k.getAbsolutePath());
                         try {
-//                            RingtoneManager.setActualDefaultRingtoneUri(MainActivity.this, RingtoneManager.TYPE_RINGTONE, newUri);
-                            Log.i("TAG", "the absolute path of the file is :"+ SOUND_OF_LIBERTY);
-                            Uri uri = MediaStore.Audio.Media.getContentUriForPath(SOUND_OF_LIBERTY);
-                            //getContentResolver().delete(uri, MediaStore.MediaColumns.DATA + "=\"" + SOUND_OF_LIBERTY + "\"", null);
-                            Uri newUri = getContentResolver().insert(uri, values);
+                            ContentResolver contentResolver = getContentResolver();
 
-                            //grantUriPermission("com.example.nonroot.libertyprime", newUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-                            System.out.println("uri=="+uri);
-                            Log.i("TAG","the ringtone uri is :"+newUri);
-                            RingtoneManager.setActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_RINGTONE, newUri);
-                        } catch (Throwable t) {
-                            Log.d("test", "UNABLE TO SET RING TONE 1");
+                            Toast.makeText(this, new StringBuilder().append("Ringtone set successfully"), Toast.LENGTH_LONG).show();
+                            RingtoneManager.setActualDefaultRingtoneUri(getBaseContext(), 1, contentResolver.insert(MediaStore.Audio.Media.getContentUriForPath(k.getAbsolutePath()), values));
+                        } catch (Throwable th) {
+                            Toast.makeText(this, new StringBuilder().append("Ringtone feature is not working"), Toast.LENGTH_LONG).show();
                         }
+//                        Uri uri = MediaStore.Audio.Media.getContentUriForPath(k.getAbsolutePath());
+//
+//                        System.out.println("old uri " + uri);
+//
+//                        MainActivity.this.getContentResolver().delete(uri, MediaStore.MediaColumns.DATA + "=\"" + path + "\"", null);
+//                        MainActivity.this.getContentResolver().insert(uri, values);
+
+//                        System.out.println("new uri " + uri);
+//                        Uri uri = MediaStore.Audio.Media.getContentUriForPath(path);
+//
+//                        getActivity().getContentResolver().delete(uri, MediaStore.MediaColumns.DATA + "=\"" + path + "\"", null);
+//                        getActivity().getContentResolver().insert(uri, values);
+//                        Log.i("TAG", "the absolute path of the file is :"+ SOUND_OF_LIBERTY);
+//
+//                        Uri ringtone = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+//                        MediaPlayer mp = MediaPlayer.create(getApplicationContext(), ringtone);
+//                        mp.start();
+//
+//                        Uri uri = MediaStore.Audio.Media.getContentUriForPath(SOUND_OF_LIBERTY);
+//                        //getContentResolver().delete(uri, MediaStore.MediaColumns.DATA + "=\"" + SOUND_OF_LIBERTY + "\"", null);
+//                        Uri newUri = getContentResolver().insert(uri, values);
+//
+//                        //grantUriPermission("com.example.nonroot.libertyprime", newUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//
+//                        System.out.println("uri=="+uri);
+//                        Log.i("TAG","the ringtone uri is :"+newUri);
+
+                        //RingtoneManager.setActualDefaultRingtoneUri(MainActivity.this, RingtoneManager.TYPE_RINGTONE, newUri);
                     }
                     catch (Throwable t) {
                         Log.d("test", "FILE NOT FOUND, THIS IS AFTER IT WAS WRITTEN TO STORAGE");
