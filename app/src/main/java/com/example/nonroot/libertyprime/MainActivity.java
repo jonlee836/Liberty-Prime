@@ -34,6 +34,7 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.Random;
 
+import static android.R.id.content;
 import static android.os.Environment.DIRECTORY_MUSIC;
 import static android.os.Environment.DIRECTORY_RINGTONES;
 
@@ -158,6 +159,7 @@ public class MainActivity extends AppCompatActivity{
         // Check if we have read or write permission
         int writePermission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         int readPermission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE);
+       // int setRingtone = ActivityCompat.checkSelfPermission(activity, Manifest.permission.U);
 
         if (writePermission != PackageManager.PERMISSION_GRANTED || readPermission != PackageManager.PERMISSION_GRANTED) {
             // We don't have permission so prompt the user
@@ -177,7 +179,6 @@ public class MainActivity extends AppCompatActivity{
 
             new File(CONTINENTAL.toString()).mkdirs();
         }
-
     }
 
     public boolean saveas(MenuItem item, int acmi, String a) {
@@ -231,8 +232,8 @@ public class MainActivity extends AppCompatActivity{
                     }
 
                     try {
-                        //sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" + SOUND_OF_LIBERTY + Environment.getExternalStorageDirectory())));
-                        File k = new File(SOUND_OF_LIBERTY, PATRIOT);
+                        //sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse(SOUND_OF_LIBERTY)));
+                        File k = new File(SOUND_OF_LIBERTY);
 
                         ContentValues values = new ContentValues();
                         values.put(MediaStore.MediaColumns.DATA, SOUND_OF_LIBERTY);
@@ -245,19 +246,31 @@ public class MainActivity extends AppCompatActivity{
                         values.put(MediaStore.Audio.Media.IS_ALARM, false);
                         values.put(MediaStore.Audio.Media.IS_MUSIC, true);
 
-                        Uri uri = MediaStore.Audio.Media.getContentUriForPath(k.getAbsolutePath());
-                        System.out.println("old uri " + uri);
-                        Uri newUri = getContentResolver().insert(uri, values);
-                        System.out.println("new uri " + newUri);
+//                        Uri uri = MediaStore.Audio.Media.getContentUriForPath(k.getAbsolutePath());
+//                        System.out.println("old uri " + uri);
+//                        Uri newUri = getContentResolver().insert(uri, values);
+//                        System.out.println("new uri " + newUri);
+//                        Uri Ringtone1 = Uri.parse("current song file path");
+                        //Insert it into the database
 
                         try {
-                            RingtoneManager.setActualDefaultRingtoneUri(MainActivity.this, RingtoneManager.TYPE_RINGTONE, newUri);
+//                            RingtoneManager.setActualDefaultRingtoneUri(MainActivity.this, RingtoneManager.TYPE_RINGTONE, newUri);
+                            Log.i("TAG", "the absolute path of the file is :"+ SOUND_OF_LIBERTY);
+                            Uri uri = MediaStore.Audio.Media.getContentUriForPath(SOUND_OF_LIBERTY);
+                            //getContentResolver().delete(uri, MediaStore.MediaColumns.DATA + "=\"" + SOUND_OF_LIBERTY + "\"", null);
+                            Uri newUri = getContentResolver().insert(uri, values);
+
+                            //grantUriPermission("com.example.nonroot.libertyprime", newUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+                            System.out.println("uri=="+uri);
+                            Log.i("TAG","the ringtone uri is :"+newUri);
+                            RingtoneManager.setActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_RINGTONE, newUri);
                         } catch (Throwable t) {
                             Log.d("test", "UNABLE TO SET RING TONE 1");
                         }
-                        RingtoneManager.setActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_RINGTONE, newUri);
-                    } catch (Exception e) {
-                        Toast.makeText(getApplicationContext(), "UNABLE TO SET RING TONE", Toast.LENGTH_LONG).show();
+                    }
+                    catch (Throwable t) {
+                        Log.d("test", "FILE NOT FOUND, THIS IS AFTER IT WAS WRITTEN TO STORAGE");
                     }
                 }
                 break;
