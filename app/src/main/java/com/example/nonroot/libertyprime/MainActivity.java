@@ -1,8 +1,11 @@
 package com.example.nonroot.libertyprime;
+import android.Manifest;
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
@@ -10,6 +13,7 @@ import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -54,14 +58,21 @@ public class MainActivity extends AppCompatActivity{
     ImageView USAUSAUSA;
     String original[];
 
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static String[] PERMISSIONS_STORAGE = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
+
     //private final File folder_ringtones = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_RINGTONES);
     //private final String folder_ringtones = (String.valueOf(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_RINGTONES))) + "/";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         DECLARE_INDEPENDENCE();
+
+        verifyStoragePermissions(this);
 
         USAUSAUSA = (ImageView) findViewById(R.id.USAUSAUSA);
         ARRAY_OF_FREEDOM = (ListView) findViewById(R.id.audioList);
@@ -142,6 +153,17 @@ public class MainActivity extends AppCompatActivity{
         return false;
     }
 
+    public static void verifyStoragePermissions(Activity activity) {
+        // Check if we have read or write permission
+        int writePermission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int readPermission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE);
+
+        if (writePermission != PackageManager.PERMISSION_GRANTED || readPermission != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(activity, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
+        }
+    }
+
     public boolean saveas(MenuItem item, int acmi, String a) {
 
         switch (item.getItemId()) {
@@ -160,15 +182,25 @@ public class MainActivity extends AppCompatActivity{
 //                String foobar = Environment.getExternalStorageDirectory().getPath();
 //                System.out.println("TEST PATH : " + foobar);
 
+                File exst = Environment.getExternalStorageDirectory();
+                String exstpath = exst.getPath();
+                File foo = new File(exstpath+"/LibertyPrime");
+                boolean worked = foo.mkdir();
+
+                System.out.println("EXTERNAL STORAGE DIRECTORY " + foo.toString());
+
+                int rawID = ARRAY_OF_DEMOCRACY[acmi];
+                InputStream fIn = getBaseContext().getResources().openRawResource(rawID);
+
                 String filename = a;
                 Boolean success = Boolean.FALSE;
-                int rawID = ARRAY_OF_DEMOCRACY[acmi];
                 //File musicdir = Environment.getExternalStoragePublicDirectory(DIRECTORY_MUSIC);
                 File musicdir = getExternalFilesDir(DIRECTORY_RINGTONES);
+
+//                File musicdir = getExternalFilesDir(DIRECTORY_RINGTONES);
                 String folder_ringtones = musicdir.toString();
 
                 byte[] buffer = null;
-                InputStream fIn = getBaseContext().getResources().openRawResource(rawID);
                 int size = 0;
 
                 try {
@@ -235,10 +267,7 @@ public class MainActivity extends AppCompatActivity{
                     System.out.println("old uri " + uri);
                     System.out.println("seuiofiseufsfe22awawasd " + uri);
 
-//                  getContentResolver().delete(uri, MediaStore.MediaColumns.DATA + "=\"" + audio_newpath.getAbsolutePath() + "\"", null);
                     Uri newUri = getContentResolver().insert(uri, values);
-//                    ContentResolver mCr = getContentResolver();
-//                    Uri newUri = mCr.insert(uri, values);
 
                     try {
                         RingtoneManager.setActualDefaultRingtoneUri(MainActivity.this, RingtoneManager.TYPE_RINGTONE, newUri);
