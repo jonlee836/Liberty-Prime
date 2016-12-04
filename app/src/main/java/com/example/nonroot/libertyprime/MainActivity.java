@@ -201,22 +201,66 @@ public class MainActivity extends AppCompatActivity{
         }
     }
 
-    public void UNALIENABLE_RIGHTS(){
-        OLD_GLORY.reset();
-        OLD_GLORY = MediaPlayer.create(this, AD_VICTORIAM);
-        OLD_GLORY.start();
-    }
+    public boolean saveas(MenuItem item, int acmi, String a) {
 
-    public void COLONIES(int rawID){
-        try{
-            LIBERTY_BELL.reset();
-            LIBERTY_BELL = MediaPlayer.create(this, rawID);
-            LIBERTY_BELL.start();
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
+        switch (item.getItemId()) {
+            case 1:
+                InputStream fIn = getBaseContext().getResources().openRawResource(ARRAY_OF_DEMOCRACY[acmi]);
+
+                String PATRIOT = ARRAY_OF_LIBERTY[acmi];
+                File INDEPENDENCE = new File(Environment.getExternalStorageDirectory()+"/LibertyPrime");
+                String SOUND_OF_LIBERTY = INDEPENDENCE.getAbsolutePath() + "/" + PATRIOT + ".mp3";
+
+                boolean exists = (new File(SOUND_OF_LIBERTY.toString())).exists();
+                if(!exists && isExternalStorageWritable() && isExternalStorageReadable()){
+                    byte[] buffer = null;
+                    int size = 0;
+
+                    try {
+                        size = fIn.available();
+                        buffer = new byte[size];
+                        System.out.println("buffer size " + size);
+
+                        fIn.read(buffer);
+                        fIn.close();
+
+                        System.out.println("INPUT STREAM AVAILABLE " + fIn.toString());
+                    } catch (IOException e) {
+                        return false;
+                    }
+
+                    FileOutputStream save;
+
+                    try {
+                        System.out.println("FILE PATH + NAME : " + SOUND_OF_LIBERTY);
+
+                        save = new FileOutputStream(SOUND_OF_LIBERTY);
+
+                        save.write(buffer);
+                        save.flush();
+                        save.close();
+
+                        System.out.println("WROTE TO DISK");
+
+                    } catch (FileNotFoundException e) {
+                        System.out.println("FILE FAILED TO WRITE " + SOUND_OF_LIBERTY);
+                    } catch (IOException e) {
+                        System.out.println("IO ERROR FAILED TO WRITE " + SOUND_OF_LIBERTY);
+                    }
+                }
+
+                Toast.makeText(getApplicationContext(), "Downloaded Ringtone!", Toast.LENGTH_LONG).show();
+
+                // Not sure why I can't directly set the ringtone after downloading.
+                // setRingtone(INDEPENDENCE, PATRIOT);
+
+                break;
+            case 2:
+                Toast.makeText(getApplicationContext(), "some other option", Toast.LENGTH_LONG).show();
+                System.out.println("CLICKED OTHER OPTION");
+                break;
         }
+        return true;
     }
 
     public void DECLARE_INDEPENDENCE() {
@@ -314,6 +358,24 @@ public class MainActivity extends AppCompatActivity{
         }
     }
 
+    public void UNALIENABLE_RIGHTS(){
+        OLD_GLORY.reset();
+        OLD_GLORY = MediaPlayer.create(this, AD_VICTORIAM);
+        OLD_GLORY.start();
+    }
+
+    public void COLONIES(int rawID){
+        try{
+            LIBERTY_BELL.reset();
+            LIBERTY_BELL = MediaPlayer.create(this, rawID);
+            LIBERTY_BELL.start();
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        }
+    }
+    
     public void SUCCESSION(){
         if (GIVE_ME_LIBERTY_OR_GIVE_ME_DEATH == Boolean.TRUE){
             LIBERTY_BELL.reset();
@@ -380,68 +442,6 @@ public class MainActivity extends AppCompatActivity{
             return true;
         }
         return false;
-    }
-
-    public boolean saveas(MenuItem item, int acmi, String a) {
-
-        switch (item.getItemId()) {
-            case 1:
-                InputStream fIn = getBaseContext().getResources().openRawResource(ARRAY_OF_DEMOCRACY[acmi]);
-
-                String PATRIOT = ARRAY_OF_LIBERTY[acmi];
-                File INDEPENDENCE = new File(Environment.getExternalStorageDirectory()+"/LibertyPrime");
-                String SOUND_OF_LIBERTY = INDEPENDENCE.getAbsolutePath() + "/" + PATRIOT + ".mp3";
-
-                boolean exists = (new File(SOUND_OF_LIBERTY.toString())).exists();
-                if(!exists && isExternalStorageWritable() && isExternalStorageReadable()){
-                    byte[] buffer = null;
-                    int size = 0;
-
-                    try {
-                        size = fIn.available();
-                        buffer = new byte[size];
-                        System.out.println("buffer size " + size);
-
-                        fIn.read(buffer);
-                        fIn.close();
-
-                        System.out.println("INPUT STREAM AVAILABLE " + fIn.toString());
-                    } catch (IOException e) {
-                        return false;
-                    }
-
-                    FileOutputStream save;
-
-                    try {
-                        System.out.println("FILE PATH + NAME : " + SOUND_OF_LIBERTY);
-
-                        save = new FileOutputStream(SOUND_OF_LIBERTY);
-
-                        save.write(buffer);
-                        save.flush();
-                        save.close();
-
-                        System.out.println("WROTE TO DISK");
-
-                    } catch (FileNotFoundException e) {
-                        System.out.println("FILE FAILED TO WRITE " + SOUND_OF_LIBERTY);
-                    } catch (IOException e) {
-                        System.out.println("IO ERROR FAILED TO WRITE " + SOUND_OF_LIBERTY);
-                    }
-                }
-
-                Toast.makeText(getApplicationContext(), "Downloaded Ringtone!", Toast.LENGTH_LONG).show();
-
-                // Not sure why I can't directly set the ringtone after downloading.
-                // setRingtone(INDEPENDENCE, PATRIOT);
-
-                break;
-            case 2:
-                Toast.makeText(getApplicationContext(), "some other option", Toast.LENGTH_LONG).show();
-                System.out.println("CLICKED OTHER OPTION");
-                break;
-        }
-        return true;
     }
 
     public void setRingtone(File INDEPENDENCE, String PATRIOT){
