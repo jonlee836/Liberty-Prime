@@ -64,7 +64,6 @@ public class MainActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (savedInstanceState == null){
 
             WE_THE_PEOPLE(this);
             DECLARE_INDEPENDENCE();
@@ -127,7 +126,7 @@ public class MainActivity extends AppCompatActivity{
                     }
                 }
             });
-        }
+
     }
 
     @Override
@@ -391,7 +390,7 @@ public class MainActivity extends AppCompatActivity{
 
                 String PATRIOT = ARRAY_OF_LIBERTY[acmi];
                 File INDEPENDENCE = new File(Environment.getExternalStorageDirectory()+"/LibertyPrime");
-                String SOUND_OF_LIBERTY = INDEPENDENCE.getPath() + "/" + PATRIOT;
+                String SOUND_OF_LIBERTY = INDEPENDENCE.getAbsolutePath() + "/" + PATRIOT + ".mp3";
 
                 boolean exists = (new File(SOUND_OF_LIBERTY.toString())).exists();
                 if(!exists && isExternalStorageWritable() && isExternalStorageReadable()){
@@ -422,6 +421,8 @@ public class MainActivity extends AppCompatActivity{
                         save.flush();
                         save.close();
 
+                        System.out.println("WROTE TO DISK");
+
                     } catch (FileNotFoundException e) {
                         System.out.println("FILE FAILED TO WRITE " + SOUND_OF_LIBERTY);
                     } catch (IOException e) {
@@ -429,8 +430,10 @@ public class MainActivity extends AppCompatActivity{
                     }
                 }
 
+                Toast.makeText(getApplicationContext(), "Downloaded Ringtone!", Toast.LENGTH_LONG).show();
+
                 // Not sure why I can't directly set the ringtone after downloading.
-                setRingtone(INDEPENDENCE, PATRIOT);
+                // setRingtone(INDEPENDENCE, PATRIOT);
 
                 break;
             case 2:
