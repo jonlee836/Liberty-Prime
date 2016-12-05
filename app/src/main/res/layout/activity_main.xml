@@ -14,68 +14,84 @@
     android:background="@drawable/libertyprime_4"
     tools:context="com.example.nonroot.libertyprime.MainActivity">
 
-
-    <TextView
-        android:id="@+id/topLabel_ADVICTORIUM"
-        android:maxLines="2"
-        android:text="DEATH TO THE INSTITUTE\nAD VICTORIUM"
-        android:gravity="center_horizontal"
-        android:textAppearance="@style/TextAppearance.AppCompat"
-        android:fontFamily="serif-monospace"
-        android:textSize="18sp"
-        android:textColor="@color/colorADVICTORIUM"
-        android:textStyle="normal|bold"
-        android:onClick="AD_VICTORIUM"
-        android:clickable="true"
-        android:layout_height="wrap_content"
-        android:lineSpacingExtra="10sp"
-        android:layout_width="match_parent"
-        android:layout_alignTop="@+id/playAll_Icon"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="13dp" />
-
-    <ImageButton
-        android:id="@+id/playAll_Icon"
-        android:paddingLeft="0dp"
-        android:paddingRight="0dp"
-        android:layout_width="65dp"
-        app:srcCompat="@drawable/bosicon"
-        android:scaleType="fitCenter"
-        android:background="@android:color/transparent"
-
-        style="@android:style/Widget.ImageButton"
-        android:layout_height="85dp"
-        android:cropToPadding="false"
-        android:adjustViewBounds="false"
-        android:elevation="0dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
-
     <LinearLayout
         android:id="@+id/widget34"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:weightSum="1"
-        android:layout_below="@+id/playAll_Icon"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_marginTop="48dp">
 
         <View
             android:layout_width="fill_parent"
-            android:layout_height="199dp"/>
+            android:layout_gravity="center"
+            android:layout_height="155dp" />
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="68dp"
+            android:gravity="center"
+            android:layout_gravity="center">
+
+            <TableRow>
+
+                <GridView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+                <GridView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+                <GridView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+                <TextView
+                    android:id="@+id/topLabel_ADVICTORIUM"
+                    android:layout_width="wrap_content"
+                    android:layout_column="0"
+                    android:maxLines="2"
+                    android:text="DEATH TO THE INSTITUTE\nAD VICTORIUM"
+                    android:textAppearance="@style/TextAppearance.AppCompat"
+                    android:onClick="AD_VICTORIUM"
+                    android:clickable="true"
+
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:fontFamily="serif-monospace"
+                    android:lineSpacingExtra="8sp"
+                    android:paddingLeft="50dp"
+                    android:textAlignment="center" />
+
+                <ImageButton
+                    android:id="@+id/playAll_Icon"
+                    android:layout_width="wrap_content"
+
+                    android:layout_column="1"
+                    android:gravity="right"
+                    app:srcCompat="@drawable/bosicon"
+                    android:background="@android:color/transparent"
+                    style="@android:style/Widget.ImageButton"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitStart"
+                    android:paddingLeft="15dp" />
+            </TableRow>
+
+        </TableLayout>
 
         <ListView
             android:id="@+id/audioList"
             android:layout_width="fill_parent"
-            android:layout_height="317dp"
+            android:layout_height="match_parent"
 
             android:dividerHeight="1dp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true" />
+
     </LinearLayout>
 
 
