@@ -10,39 +10,10 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-
     android:padding="0dp"
     android:background="@drawable/libertyprime_4"
     tools:context="com.example.nonroot.libertyprime.MainActivity">
 
-    <ListView
-        android:id="@+id/audioList"
-        android:layout_width="match_parent"
-        android:layout_centerInParent="false"
-        android:headerDividersEnabled="true"
-        android:footerDividersEnabled="true"
-        android:dividerHeight="1dp"
-        android:layout_height="325dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
-    <ImageButton
-        android:id="@+id/playAll_Icon"
-        android:paddingLeft="0dp"
-        android:paddingRight="0dp"
-        android:layout_width="65dp"
-        app:srcCompat="@drawable/bosicon"
-        android:adjustViewBounds="false"
-        android:scaleType="fitCenter"
-        android:cropToPadding="true"
-        android:background="@android:color/transparent"
-
-        style="@android:style/Widget.ImageButton"
-        android:layout_height="85dp"
-        android:layout_above="@+id/audioList"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
 
     <TextView
         android:id="@+id/topLabel_ADVICTORIUM"
@@ -58,8 +29,54 @@
         android:clickable="true"
         android:layout_height="wrap_content"
         android:lineSpacingExtra="10sp"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_alignTop="@+id/playAll_Icon"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="13dp" />
+
+    <ImageButton
+        android:id="@+id/playAll_Icon"
+        android:paddingLeft="0dp"
+        android:paddingRight="0dp"
+        android:layout_width="65dp"
+        app:srcCompat="@drawable/bosicon"
+        android:scaleType="fitCenter"
+        android:background="@android:color/transparent"
+
+        style="@android:style/Widget.ImageButton"
+        android:layout_height="85dp"
+        android:cropToPadding="false"
+        android:adjustViewBounds="false"
+        android:elevation="0dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <LinearLayout
+        android:id="@+id/widget34"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:weightSum="1"
+        android:layout_below="@+id/playAll_Icon"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="48dp">
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="199dp"/>
+
+        <ListView
+            android:id="@+id/audioList"
+            android:layout_width="fill_parent"
+            android:layout_height="317dp"
+
+            android:dividerHeight="1dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+    </LinearLayout>
+
 
 </RelativeLayout>
