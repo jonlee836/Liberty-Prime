@@ -33,25 +33,18 @@ import java.util.Random;
 
 public class MainActivity extends AppCompatActivity{
 
-    Boolean GIVE_ME_LIBERTY_OR_GIVE_ME_DEATH = Boolean.TRUE;
+    int marchAudio_Main, currRawID, currAudio_compare;
+    int rawIDs[], marchIDs[], weaponIDs[];
 
-    Field UNJUST_TAXATION[];
-    
-    int ONE_IF_BY_LAND[];
-    int TWO_IF_BY_SEA[];
+    Field rawItems[];
+    String audioFileNames[];
+    ListView ListView_audioFileNames;
+    Boolean playAllaudio_Bool = Boolean.TRUE;
 
-    int ARRAY_OF_DEMOCRACY[];
-    String ARRAY_OF_LIBERTY[];
-    ListView ARRAY_OF_FREEDOM;
-
-    TextView SHALL_NOT_BE_INFRINGED;
-
-    AudioManager LIVE_FREE_OR_DIE;
-    MediaPlayer LIBERTY_BELL, OLD_GLORY;
-    ImageView USAUSAUSA;
-    String UNCHANGED[];
-
-    int AD_VICTORIAM, PRICE_OF_FREEDOM, BRITISH_TYRANNY;
+    TextView TextView_audioName;
+    AudioManager audioMngr;
+    MediaPlayer mediaPlayer_VOICE, mediaPlayer_MARCH;
+    ImageView playAll_Icon;
 
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {
@@ -65,29 +58,30 @@ public class MainActivity extends AppCompatActivity{
         setContentView(R.layout.activity_main);
 
 
-            WE_THE_PEOPLE(this);
-            DECLARE_INDEPENDENCE();
-            MANIFEST_DESTINY();
+            permissionCheck(this);
+            init_RAWfiles();
+            folderCheck();
 
-            USAUSAUSA = (ImageView) findViewById(R.id.USAUSAUSA);
-            ARRAY_OF_FREEDOM = (ListView) findViewById(R.id.audioList);
-            SHALL_NOT_BE_INFRINGED = (TextView) findViewById(R.id.topLabel_ADVICTORIUM);
+            playAll_Icon = (ImageView) findViewById(R.id.playAll_Icon);
+            ListView_audioFileNames = (ListView) findViewById(R.id.audioList);
+            TextView_audioName = (TextView) findViewById(R.id.topLabel_ADVICTORIUM);
 
-            LIVE_FREE_OR_DIE = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-            LIVE_FREE_OR_DIE.setStreamVolume(AudioManager.STREAM_MUSIC, 100, 0);
+            // create AudioManager and set the volume to max on app launch.
+            //audioMngr = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+            //audioMngr.setStreamVolume(AudioManager.STREAM_MUSIC, 30, 0);
 
-            final ArrayAdapter LIBERTY = new ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, ARRAY_OF_LIBERTY);
+            final ArrayAdapter adapter_for_List = new ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, audioFileNames);
 
-            ARRAY_OF_FREEDOM.setAdapter(LIBERTY);
-            registerForContextMenu(ARRAY_OF_FREEDOM);
+            ListView_audioFileNames.setAdapter(adapter_for_List);
+            registerForContextMenu(ListView_audioFileNames);
 
-            LIBERTY_BELL = new MediaPlayer();
-            OLD_GLORY = new MediaPlayer();
+            mediaPlayer_VOICE = new MediaPlayer();
+            mediaPlayer_MARCH = new MediaPlayer();
 
-            ARRAY_OF_FREEDOM.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            ListView_audioFileNames.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
                 @Override
                 public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                    String audio_filename = ARRAY_OF_LIBERTY[position];
+                    String audio_filename = audioFileNames[position];
                     Log.v("long clicked", String.valueOf(audio_filename));
 
                     return false;
@@ -95,33 +89,33 @@ public class MainActivity extends AppCompatActivity{
 
             });
 
-            ARRAY_OF_FREEDOM.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            ListView_audioFileNames.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
-                    SUCCESSION();
-                    COLONIES(ARRAY_OF_DEMOCRACY[position]);
+                    playAll_Check();
+                    playVoice(rawIDs[position]);
 
-                    BEFORE_1776();
+                    set_playAll_false();
                 }
             });
 
-            SHALL_NOT_BE_INFRINGED.setOnClickListener(new View.OnClickListener() {
+            TextView_audioName.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    SUCCESSION();
-                    UNALIENABLE_RIGHTS();
+                    playAll_Check();
+                    playMarch();
 
-                    BEFORE_1776();
+                    set_playAll_false();
                 }
             });
 
-            USAUSAUSA.setOnClickListener(new View.OnClickListener() {
+            playAll_Icon.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    AFTER_1776();
-                    BALANCE_OF_POWER();
+                    set_playAll_true();
+                    stopAll_Audio();
 
-                    if (!LIBERTY_BELL.isPlaying()) {
+                    if (!mediaPlayer_VOICE.isPlaying()){
                         LET_FREEDOM_RING();
                     }
                 }
@@ -139,15 +133,15 @@ public class MainActivity extends AppCompatActivity{
     public boolean onContextItemSelected(MenuItem item) {
 
         AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        String audio_file_name = (String) ARRAY_OF_FREEDOM.getItemAtPosition(acmi.position);
+        String audio_file_name = (String) ListView_audioFileNames.getItemAtPosition(acmi.position);
         int acmi_pos = acmi.position;
-        saveas(item, acmi_pos, audio_file_name);
+        download_Ringtone(item, acmi_pos, audio_file_name);
 
         Log.v("long clicked",String.valueOf(audio_file_name));
         return false;
     }
 
-    public static void WE_THE_PEOPLE(Activity activity) {
+    public static void permissionCheck(Activity activity) {
         int writePermission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         int readPermission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE);
 
@@ -156,7 +150,7 @@ public class MainActivity extends AppCompatActivity{
         }
     }
 
-    public void MANIFEST_DESTINY(){
+    public void folderCheck(){
 
         File INDEPENDENCE =  Environment.getExternalStorageDirectory();
         File CONTINENTAL = new File(INDEPENDENCE+"/LibertyPrime");
@@ -172,21 +166,22 @@ public class MainActivity extends AppCompatActivity{
 
     public void LET_FREEDOM_RING(){
 
-        if (GIVE_ME_LIBERTY_OR_GIVE_ME_DEATH) {
+        if (playAllaudio_Bool) {
 
+            // This is to stop it from playing the same voice file consecutively.
             int currRnd;
             do {
-                currRnd = new Random().nextInt(ARRAY_OF_DEMOCRACY.length);
-            } while (currRnd == PRICE_OF_FREEDOM);
+                currRnd = new Random().nextInt(rawIDs.length);
+            } while (currRnd == currRawID);
 
-            PRICE_OF_FREEDOM = currRnd;
+            currRawID = currRnd;
 
-            LIBERTY_BELL = MediaPlayer.create(this, ARRAY_OF_DEMOCRACY[currRnd]);
-            LIBERTY_BELL.start();
+            mediaPlayer_VOICE = MediaPlayer.create(this, rawIDs[currRnd]);
+            mediaPlayer_VOICE.start();
 
-            // recursively keep playing until bool is set false by other onClicks
-            if (currRnd < BRITISH_TYRANNY) {
-                LIBERTY_BELL.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            // Recursively keep playing until bool is set false by onClick listeners with playAll_Check
+            if (currRnd < currAudio_compare) {
+                mediaPlayer_VOICE.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                     @Override
                     public void onCompletion(MediaPlayer mp) {
                         LET_FREEDOM_RING();
@@ -194,20 +189,20 @@ public class MainActivity extends AppCompatActivity{
                 });
             }
 
-            if (!OLD_GLORY.isPlaying()) {
-                UNALIENABLE_RIGHTS();
+            if (!mediaPlayer_MARCH.isPlaying()) {
+                playMarch();
             }
 
         }
     }
 
-    public boolean saveas(MenuItem item, int acmi, String a) {
+    public boolean download_Ringtone(MenuItem item, int acmi, String a) {
 
         switch (item.getItemId()) {
             case 1:
-                InputStream fIn = getBaseContext().getResources().openRawResource(ARRAY_OF_DEMOCRACY[acmi]);
+                InputStream fIn = getBaseContext().getResources().openRawResource(rawIDs[acmi]);
 
-                String PATRIOT = ARRAY_OF_LIBERTY[acmi];
+                String PATRIOT = audioFileNames[acmi];
                 File INDEPENDENCE = new File(Environment.getExternalStorageDirectory()+"/LibertyPrime");
                 String SOUND_OF_LIBERTY = INDEPENDENCE.getAbsolutePath() + "/" + PATRIOT + ".mp3";
 
@@ -263,10 +258,10 @@ public class MainActivity extends AppCompatActivity{
         return true;
     }
 
-    public void DECLARE_INDEPENDENCE() {
+    public void init_RAWfiles() {
 
-        UNJUST_TAXATION = R.raw.class.getDeclaredFields();
-        BRITISH_TYRANNY = 0;
+        rawItems = R.raw.class.getDeclaredFields();
+        currAudio_compare = 0;
 
         int startIndstr = 0;
         int mrchIndx_Start = -1;
@@ -280,11 +275,11 @@ public class MainActivity extends AppCompatActivity{
         String wd = "z_w";
 
         try {
-            for (int i = 0; i < UNJUST_TAXATION.length; i++) {
-                String str_name = UNJUST_TAXATION[i].getName();
+            for (int i = 0; i < rawItems.length; i++) {
+                String str_name = rawItems[i].getName();
 
                 if (BadStr_check(str_name)){
-                    BRITISH_TYRANNY++;
+                    currAudio_compare++;
                 }
                 if (Type_Check(str_name, md) == Boolean.TRUE && mrchIndx_Start == -1){
                     mrchIndx_Start = i;
@@ -293,8 +288,8 @@ public class MainActivity extends AppCompatActivity{
                     weapIndx_Start = i;
                 }
 
-                if (UNJUST_TAXATION[i].getName() == "z_primemarch") {
-                    AD_VICTORIAM = UNJUST_TAXATION[i].getInt(null);
+                if (rawItems[i].getName() == "z_primemarch") {
+                    marchAudio_Main = rawItems[i].getInt(null);
                 }
             }
         } catch (Exception e) {
@@ -302,17 +297,16 @@ public class MainActivity extends AppCompatActivity{
         }
 
         // marching audio, weapon audio
-        ONE_IF_BY_LAND = new int[weapIndx_Start - mrchIndx_Start];
-        TWO_IF_BY_SEA = new int[UNJUST_TAXATION.length - weapIndx_Start];
-        BRITISH_TYRANNY -= ONE_IF_BY_LAND.length + TWO_IF_BY_SEA.length;
+        marchIDs = new int[weapIndx_Start - mrchIndx_Start];
+        weaponIDs = new int[rawItems.length - weapIndx_Start];
+        currAudio_compare -= marchIDs.length + weaponIDs.length;
 
 //        int writepath = weapIndx_Start-mrchIndx_Start;
-//        int bar = UNJUST_TAXATION.length - weapIndx_Start;
+//        int bar = rawItems.length - weapIndx_Start;
 
-        // audio int rawIDs and strings for viewlist
-        ARRAY_OF_DEMOCRACY = new int[BRITISH_TYRANNY];
-        ARRAY_OF_LIBERTY = new String[BRITISH_TYRANNY];
-        UNCHANGED = new String[BRITISH_TYRANNY];
+        // audio int rawItems and strings for viewlist
+        rawIDs = new int[currAudio_compare];
+        audioFileNames = new String[currAudio_compare];
 
         // for now it's just 1 min clips of prime marching
         // eventually i'll make the gun fire and marching random so you get a unique
@@ -323,31 +317,30 @@ public class MainActivity extends AppCompatActivity{
             int mrchCount = 0;
             int weapCount = 0;
 
-            for(int i = 0; i < UNJUST_TAXATION.length; i++) {
+            for(int i = 0; i < rawItems.length; i++) {
 
-                if (!BadStr_check(UNJUST_TAXATION[i].getName()) && i < mrchIndx_Start){
+                if (!BadStr_check(rawItems[i].getName()) && i < mrchIndx_Start){
                     continue;
                 }
                 if (i < mrchIndx_Start){
-                    ARRAY_OF_LIBERTY[startIndstr] = UNJUST_TAXATION[i].getName();
-                    UNCHANGED[startIndstr] = ARRAY_OF_LIBERTY[startIndstr];
-                    ARRAY_OF_LIBERTY[startIndstr] = ARRAY_OF_LIBERTY[startIndstr].toUpperCase();
+                    audioFileNames[startIndstr] = rawItems[i].getName();
+                    audioFileNames[startIndstr] = audioFileNames[startIndstr].toUpperCase();
 
-                    if (ARRAY_OF_LIBERTY[startIndstr].equals("COMMUNISM___")){
-                        ARRAY_OF_LIBERTY[startIndstr] = "SOCIALISM";
+                    if (audioFileNames[startIndstr].equals("COMMUNISM___")){
+                        audioFileNames[startIndstr] = "SOCIALISM";
                     }
-                    ARRAY_OF_LIBERTY[startIndstr] = ARRAY_OF_LIBERTY[startIndstr].replace("_", " ");
-                    ARRAY_OF_DEMOCRACY[startIndstr] = UNJUST_TAXATION[i].getInt(null);
+                    audioFileNames[startIndstr] = audioFileNames[startIndstr].replace("_", " ");
+                    rawIDs[startIndstr] = rawItems[i].getInt(null);
 
-                    System.out.println(ARRAY_OF_LIBERTY[startIndstr] + " " + startIndstr + " " + ARRAY_OF_DEMOCRACY[startIndstr]);
+                    System.out.println(audioFileNames[startIndstr] + " " + startIndstr + " " + rawIDs[startIndstr]);
                 }
 
                 if (i >= mrchIndx_Start && i < weapIndx_Start) {
-                    ONE_IF_BY_LAND[mrchCount] = UNJUST_TAXATION[i].getInt(null);
+                    marchIDs[mrchCount] = rawItems[i].getInt(null);
                     mrchCount++;
                 }
-                else if (i >= weapIndx_Start && i < UNJUST_TAXATION.length) {
-                    TWO_IF_BY_SEA[weapCount] = UNJUST_TAXATION[i].getInt(null);
+                else if (i >= weapIndx_Start && i < rawItems.length) {
+                    weaponIDs[weapCount] = rawItems[i].getInt(null);
                     weapCount++;
                 }
 
@@ -358,44 +351,44 @@ public class MainActivity extends AppCompatActivity{
         }
     }
 
-    public void UNALIENABLE_RIGHTS(){
-        OLD_GLORY.reset();
-        OLD_GLORY = MediaPlayer.create(this, AD_VICTORIAM);
-        OLD_GLORY.start();
+    public void playMarch(){
+        mediaPlayer_MARCH.reset();
+        mediaPlayer_MARCH = MediaPlayer.create(this, marchAudio_Main);
+        mediaPlayer_MARCH.start();
     }
 
-    public void COLONIES(int rawID){
+    public void playVoice(int rawID){
         try{
-            LIBERTY_BELL.reset();
-            LIBERTY_BELL = MediaPlayer.create(this, rawID);
-            LIBERTY_BELL.start();
+            mediaPlayer_VOICE.reset();
+            mediaPlayer_VOICE = MediaPlayer.create(this, rawID);
+            mediaPlayer_VOICE.start();
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         } catch (IllegalStateException e) {
             e.printStackTrace();
         }
     }
-    
-    public void SUCCESSION(){
-        if (GIVE_ME_LIBERTY_OR_GIVE_ME_DEATH == Boolean.TRUE){
-            LIBERTY_BELL.reset();
-            OLD_GLORY.reset();
 
-            BEFORE_1776();
+    public void playAll_Check(){
+        if (playAllaudio_Bool == Boolean.TRUE){
+            mediaPlayer_VOICE.reset();
+            mediaPlayer_MARCH.reset();
+
+            set_playAll_false();
         }
     }
 
-    public void BEFORE_1776(){
-        GIVE_ME_LIBERTY_OR_GIVE_ME_DEATH = Boolean.FALSE;
+    public void set_playAll_false(){
+        playAllaudio_Bool = Boolean.FALSE;
     }
 
-    public void AFTER_1776(){
-        GIVE_ME_LIBERTY_OR_GIVE_ME_DEATH = Boolean.TRUE;
+    public void set_playAll_true(){
+        playAllaudio_Bool = Boolean.TRUE;
     }
 
-    public void BALANCE_OF_POWER(){
-        LIBERTY_BELL.reset();
-        OLD_GLORY.reset();
+    public void stopAll_Audio(){
+        mediaPlayer_VOICE.reset();
+        mediaPlayer_MARCH.reset();
     }
 
     private Boolean BadStr_check(String a){
