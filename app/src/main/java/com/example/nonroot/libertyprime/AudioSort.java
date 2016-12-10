@@ -11,8 +11,8 @@ import java.lang.reflect.Field;
 
 public class AudioSort {
 
-    int marchAudio_Main, currRawID, currAudio_compare;
-    int rawIDs[], marchIDs[], weaponIDs[];
+    int marchAudio_Main, currRawID, voiceSize;
+    int voiceIDs[], marchIDs[], weaponIDs[];
     String audioFileNames[];
 
     Field rawItems[];
@@ -27,7 +27,7 @@ public class AudioSort {
     }
 
     public int[] get_rawIDs(){
-        return rawIDs;
+        return voiceIDs;
     }
 
     public int[] get_marchIDs(){
@@ -41,7 +41,7 @@ public class AudioSort {
     public void init_RAWfiles() {
 
         rawItems = R.raw.class.getDeclaredFields();
-        int currAudio_compare = 0;
+        int voiceSize = 0;
 
         int startIndstr = 0;
         int mrchIndx_Start = -1;
@@ -59,7 +59,7 @@ public class AudioSort {
                 String str_name = rawItems[i].getName();
 
                 if (BadStr_check(str_name)){
-                    currAudio_compare++;
+                    voiceSize++;
                 }
                 if (Type_Check(str_name, md) == Boolean.TRUE && mrchIndx_Start == -1){
                     mrchIndx_Start = i;
@@ -79,14 +79,14 @@ public class AudioSort {
         // marching audio, weapon audio
         marchIDs = new int[weapIndx_Start - mrchIndx_Start];
         weaponIDs = new int[rawItems.length - weapIndx_Start];
-        currAudio_compare -= marchIDs.length + weaponIDs.length;
+        voiceSize -= marchIDs.length + weaponIDs.length;
 
         // int writepath = weapIndx_Start-mrchIndx_Start;
         // int bar = rawItems.length - weapIndx_Start;
 
         // audio int rawItems and strings for viewlist
-        rawIDs = new int[currAudio_compare];
-        audioFileNames = new String[currAudio_compare];
+        voiceIDs = new int[voiceSize];
+        audioFileNames = new String[voiceSize];
 
         // for now it's just 1 min clips of prime marching
         // eventually i'll make the gun fire and marching random so you get a unique
@@ -110,9 +110,9 @@ public class AudioSort {
                         audioFileNames[startIndstr] = "SOCIALISM";
                     }
                     audioFileNames[startIndstr] = audioFileNames[startIndstr].replace("_", " ");
-                    rawIDs[startIndstr] = rawItems[i].getInt(null);
+                    voiceIDs[startIndstr] = rawItems[i].getInt(null);
 
-                    System.out.println(audioFileNames[startIndstr] + " " + startIndstr + " " + rawIDs[startIndstr]);
+                    System.out.println(audioFileNames[startIndstr] + " " + startIndstr + " " + voiceIDs[startIndstr]);
                 }
 
                 if (i >= mrchIndx_Start && i < weapIndx_Start) {
@@ -139,10 +139,11 @@ public class AudioSort {
         // primemarch is not one of them.
 
         if (a == "$change" ||
-                a == "serialVersionUID") {
+            a == "serialVersionUID") {
 
             System.out.println("BADSTR_CHECK : " + a);
             return Boolean.FALSE;
+
         }
         else {
             return Boolean.TRUE;
