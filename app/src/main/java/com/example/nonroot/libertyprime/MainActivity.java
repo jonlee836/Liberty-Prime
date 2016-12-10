@@ -116,9 +116,6 @@ public class MainActivity extends AppCompatActivity{
                 if (mediaPlayer_MARCH.isPlaying()){
                     mediaPlayer_MARCH.stop();
                 }
-                else if (mediaPlayer_MARCH.isPlaying() && mediaPlayer_VOICE.isPlaying() && playAllaudio_Bool){
-                    stopAll_Audio();
-                }
                 else{
                     playMarch();
                 }
