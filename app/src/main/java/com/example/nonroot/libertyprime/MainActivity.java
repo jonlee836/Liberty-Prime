@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -40,7 +41,9 @@ public class MainActivity extends AppCompatActivity{
 
     String audioFileNames[];
     ListView ListView_audioFileNames;
+
     Boolean playAllaudio_Bool = Boolean.TRUE;
+    Boolean onFirstRun = Boolean.TRUE;
 
     TextView TextView_audioName;
     MediaPlayer mediaPlayer_VOICE, mediaPlayer_MARCH;
@@ -72,9 +75,7 @@ public class MainActivity extends AppCompatActivity{
         marchIDs = a.get_marchIDs();
 
         marchAudio_Main = a.get_marchAudio();
-
-        //init_RAWfiles();
-
+        
         playAll_Icon = (ImageView) findViewById(R.id.playAll_Icon);
         ListView_audioFileNames = (ListView) findViewById(R.id.audioList);
         TextView_audioName = (TextView) findViewById(R.id.topLabel_ADVICTORIUM);
@@ -104,24 +105,21 @@ public class MainActivity extends AppCompatActivity{
         ListView_audioFileNames.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
-                playAll_Check();
                 playVoice(voiceIDs[position]);
+                set_playAll_false();
             }
         });
 
         TextView_audioName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                playAll_Check();
                 if (mediaPlayer_MARCH.isPlaying()){
-                    mediaPlayer_MARCH.stop();
+                    mediaPlayer_MARCH.reset();
                 }
-                else if (!mediaPlayer_MARCH.isPlaying() && playAllaudio_Bool){
+                else if (!mediaPlayer_MARCH.isPlaying()){
                     playMarch();
                 }
-                else{
-                    stopAll_Audio();
-                }
+                set_playAll_false();
             }
         });
 
@@ -129,7 +127,9 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 set_playAll_true();
-                stopAll_Audio();
+
+                mediaPlayer_VOICE.reset();
+                mediaPlayer_MARCH.reset();
 
                 if (!mediaPlayer_VOICE.isPlaying()){
                     LET_FREEDOM_RING();
@@ -156,7 +156,7 @@ public class MainActivity extends AppCompatActivity{
         return false;
     }
 
-    public static void permissionCheck(Activity activity) {
+        public static void permissionCheck(Activity activity) {
         int writePermission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         int readPermission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE);
 
@@ -182,7 +182,6 @@ public class MainActivity extends AppCompatActivity{
     public void LET_FREEDOM_RING(){
 
         if (playAllaudio_Bool) {
-
             // This is to stop it from playing the same voice file consecutively.
             int currRnd;
             do {
@@ -225,6 +224,7 @@ public class MainActivity extends AppCompatActivity{
                     byte[] buffer = null;
                     int size = 0;
 
+                    // CREATE INPUT STREAM FROM AUDIO FILE IN RAW FOLDER, WRITE TO PUBLIC STORAGE
                     try {
                         size = fIn.available();
                         buffer = new byte[size];
@@ -284,25 +284,12 @@ public class MainActivity extends AppCompatActivity{
         }
     }
 
-    public void playAll_Check(){
-        if (playAllaudio_Bool == Boolean.TRUE){
-            mediaPlayer_VOICE.reset();
-            mediaPlayer_MARCH.reset();
-
-            set_playAll_false();
-        }
-    }
     public void set_playAll_false(){
         playAllaudio_Bool = Boolean.FALSE;
     }
 
     public void set_playAll_true(){
         playAllaudio_Bool = Boolean.TRUE;
-    }
-
-    public void stopAll_Audio(){
-        mediaPlayer_VOICE.reset();
-        mediaPlayer_MARCH.reset();
     }
 
     public void playMarch(){
