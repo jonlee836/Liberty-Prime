@@ -33,18 +33,20 @@ import java.util.Random;
 
 public class MainActivity extends AppCompatActivity{
 
+    Field rawItems[];
+
     int marchAudio_Main, currRawID, currAudio_compare;
     int rawIDs[], marchIDs[], weaponIDs[];
 
-    Field rawItems[];
     String audioFileNames[];
     ListView ListView_audioFileNames;
     Boolean playAllaudio_Bool = Boolean.TRUE;
 
     TextView TextView_audioName;
-    AudioManager audioMngr;
     MediaPlayer mediaPlayer_VOICE, mediaPlayer_MARCH;
     ImageView playAll_Icon;
+
+    //AudioManager audioMngr;
 
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {
@@ -57,69 +59,79 @@ public class MainActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-            permissionCheck(this);
-            init_RAWfiles();
-            folderCheck();
+        permissionCheck(this);
+        folderCheck();
 
-            playAll_Icon = (ImageView) findViewById(R.id.playAll_Icon);
-            ListView_audioFileNames = (ListView) findViewById(R.id.audioList);
-            TextView_audioName = (TextView) findViewById(R.id.topLabel_ADVICTORIUM);
+        rawItems = R.raw.class.getDeclaredFields();
+        AudioSort a = new AudioSort();
+        a.init_RAWfiles();
 
-            // create AudioManager and set the volume to max on app launch.
-            //audioMngr = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-            //audioMngr.setStreamVolume(AudioManager.STREAM_MUSIC, 30, 0);
+        rawIDs = a.get_rawIDs();
+        audioFileNames = a.get_StrFileNames();
+        weaponIDs = a.get_weaponIDs();
+        marchIDs = a.get_marchIDs();
 
-            final ArrayAdapter adapter_for_List = new ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, audioFileNames);
+        marchAudio_Main = a.get_marchAudio();
 
-            ListView_audioFileNames.setAdapter(adapter_for_List);
-            registerForContextMenu(ListView_audioFileNames);
+        //init_RAWfiles();
 
-            mediaPlayer_VOICE = new MediaPlayer();
-            mediaPlayer_MARCH = new MediaPlayer();
+        playAll_Icon = (ImageView) findViewById(R.id.playAll_Icon);
+        ListView_audioFileNames = (ListView) findViewById(R.id.audioList);
+        TextView_audioName = (TextView) findViewById(R.id.topLabel_ADVICTORIUM);
 
-            ListView_audioFileNames.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-                @Override
-                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                    String audio_filename = audioFileNames[position];
-                    Log.v("long clicked", String.valueOf(audio_filename));
+        // create AudioManager and set the volume to max on app launch.
+        //audioMngr = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        //audioMngr.setStreamVolume(AudioManager.STREAM_MUSIC, 30, 0);
 
-                    return false;
+        final ArrayAdapter adapter_for_List = new ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, audioFileNames);
+
+        ListView_audioFileNames.setAdapter(adapter_for_List);
+        registerForContextMenu(ListView_audioFileNames);
+
+        mediaPlayer_VOICE = new MediaPlayer();
+        mediaPlayer_MARCH = new MediaPlayer();
+
+        ListView_audioFileNames.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                String audio_filename = audioFileNames[position];
+                Log.v("long clicked", String.valueOf(audio_filename));
+
+                return false;
+            }
+        });
+
+        ListView_audioFileNames.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
+                playAll_Check();
+                playVoice(rawIDs[position]);
+
+                set_playAll_false();
+            }
+        });
+
+        TextView_audioName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                playAll_Check();
+                playMarch();
+
+                set_playAll_false();
+            }
+        });
+
+        playAll_Icon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                set_playAll_true();
+                stopAll_Audio();
+
+                if (!mediaPlayer_VOICE.isPlaying()){
+                    LET_FREEDOM_RING();
                 }
-
-            });
-
-            ListView_audioFileNames.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
-                    playAll_Check();
-                    playVoice(rawIDs[position]);
-
-                    set_playAll_false();
-                }
-            });
-
-            TextView_audioName.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    playAll_Check();
-                    playMarch();
-
-                    set_playAll_false();
-                }
-            });
-
-            playAll_Icon.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    set_playAll_true();
-                    stopAll_Audio();
-
-                    if (!mediaPlayer_VOICE.isPlaying()){
-                        LET_FREEDOM_RING();
-                    }
-                }
-            });
-
+            }
+        });
     }
 
     @Override
@@ -191,7 +203,6 @@ public class MainActivity extends AppCompatActivity{
             if (!mediaPlayer_MARCH.isPlaying()) {
                 playMarch();
             }
-
         }
     }
 
@@ -257,104 +268,123 @@ public class MainActivity extends AppCompatActivity{
         return true;
     }
 
-    public void init_RAWfiles() {
-
-        rawItems = R.raw.class.getDeclaredFields();
-        currAudio_compare = 0;
-
-        int startIndstr = 0;
-        int mrchIndx_Start = -1;
-        int weapIndx_Start = -1;
-
-        // "$change" will appear if you're using the instant run feature.
-        // 11/16/2016 : Found a string at Field[49] named "SerialVersionUID" which had an R.raw
-        // value of 0.
-
-        String md = "z_p";
-        String wd = "z_w";
-
-        try {
-            for (int i = 0; i < rawItems.length; i++) {
-                String str_name = rawItems[i].getName();
-
-                if (BadStr_check(str_name)){
-                    currAudio_compare++;
-                }
-                if (Type_Check(str_name, md) == Boolean.TRUE && mrchIndx_Start == -1){
-                    mrchIndx_Start = i;
-                }
-                if (Type_Check(str_name, wd) == Boolean.TRUE && weapIndx_Start == -1){
-                    weapIndx_Start = i;
-                }
-
-                if (rawItems[i].getName() == "z_primemarch") {
-                    marchAudio_Main = rawItems[i].getInt(null);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        // marching audio, weapon audio
-        marchIDs = new int[weapIndx_Start - mrchIndx_Start];
-        weaponIDs = new int[rawItems.length - weapIndx_Start];
-        currAudio_compare -= marchIDs.length + weaponIDs.length;
-
-//        int writepath = weapIndx_Start-mrchIndx_Start;
-//        int bar = rawItems.length - weapIndx_Start;
-
-        // audio int rawItems and strings for viewlist
-        rawIDs = new int[currAudio_compare];
-        audioFileNames = new String[currAudio_compare];
-
-        // for now it's just 1 min clips of prime marching
-        // eventually i'll make the gun fire and marching random so you get a unique
-        // experience every time.
-
-        try {
-
-            int mrchCount = 0;
-            int weapCount = 0;
-
-            for(int i = 0; i < rawItems.length; i++) {
-
-                if (!BadStr_check(rawItems[i].getName()) && i < mrchIndx_Start){
-                    continue;
-                }
-                if (i < mrchIndx_Start){
-                    audioFileNames[startIndstr] = rawItems[i].getName();
-                    audioFileNames[startIndstr] = audioFileNames[startIndstr].toUpperCase();
-
-                    if (audioFileNames[startIndstr].equals("COMMUNISM___")){
-                        audioFileNames[startIndstr] = "SOCIALISM";
-                    }
-                    audioFileNames[startIndstr] = audioFileNames[startIndstr].replace("_", " ");
-                    rawIDs[startIndstr] = rawItems[i].getInt(null);
-
-                    System.out.println(audioFileNames[startIndstr] + " " + startIndstr + " " + rawIDs[startIndstr]);
-                }
-
-                if (i >= mrchIndx_Start && i < weapIndx_Start) {
-                    marchIDs[mrchCount] = rawItems[i].getInt(null);
-                    mrchCount++;
-                }
-                else if (i >= weapIndx_Start && i < rawItems.length) {
-                    weaponIDs[weapCount] = rawItems[i].getInt(null);
-                    weapCount++;
-                }
-
-                startIndstr++;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void playMarch(){
-        mediaPlayer_MARCH.reset();
-        mediaPlayer_MARCH = MediaPlayer.create(this, marchAudio_Main);
-        mediaPlayer_MARCH.start();
-    }
+//    public void init_RAWfiles() {
+//
+//        int audioCount = 0;
+//
+//        int startIndstr = 0;
+//        int mrchIndx_Start = -1;
+//        int weapIndx_Start = -1;
+//
+//        // "$change" will appear if you're using the instant run feature.
+//        // 11/16/2016 : Found a string at Field[49] named "SerialVersionUID" which had an R.raw
+//        // value of 0.
+//
+//        String md = "z_p";
+//        String wd = "z_w";
+//
+//        try {
+//            for (int i = 0; i < rawItems.length; i++) {
+//                String str_name = rawItems[i].getName();
+//
+//                if (BadStr_check(str_name)){
+//                    audioCount++;
+//                }
+//                if (Type_Check(str_name, md) == Boolean.TRUE && mrchIndx_Start == -1){
+//                    mrchIndx_Start = i;
+//                }
+//                if (Type_Check(str_name, wd) == Boolean.TRUE && weapIndx_Start == -1){
+//                    weapIndx_Start = i;
+//                }
+//
+//                if (rawItems[i].getName() == "z_primemarch") {
+//                    marchAudio_Main = rawItems[i].getInt(null);
+//                }
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//        // marching audio, weapon audio
+//        marchIDs = new int[weapIndx_Start - mrchIndx_Start];
+//        weaponIDs = new int[rawItems.length - weapIndx_Start];
+//        audioCount -= marchIDs.length + weaponIDs.length;
+//
+//        // int writepath = weapIndx_Start-mrchIndx_Start;
+//        // int bar = rawItems.length - weapIndx_Start;
+//
+//        // audio int rawItems and strings for viewlist
+//        rawIDs = new int[audioCount];
+//        audioFileNames = new String[audioCount];
+//
+//        // for now it's just 1 min clips of prime marching
+//        // eventually i'll make the gun fire and marching random so you get a unique
+//        // experience every time.
+//
+//        try {
+//
+//            int mrchCount = 0;
+//            int weapCount = 0;
+//
+//            for(int i = 0; i < rawItems.length; i++) {
+//
+//                if (!BadStr_check(rawItems[i].getName()) && i < mrchIndx_Start){
+//                    continue;
+//                }
+//                if (i < mrchIndx_Start){
+//                    audioFileNames[startIndstr] = rawItems[i].getName();
+//                    audioFileNames[startIndstr] = audioFileNames[startIndstr].toUpperCase();
+//
+//                    if (audioFileNames[startIndstr].equals("COMMUNISM___")){
+//                        audioFileNames[startIndstr] = "SOCIALISM";
+//                    }
+//                    audioFileNames[startIndstr] = audioFileNames[startIndstr].replace("_", " ");
+//                    rawIDs[startIndstr] = rawItems[i].getInt(null);
+//
+//                    System.out.println(audioFileNames[startIndstr] + " " + startIndstr + " " + rawIDs[startIndstr]);
+//                }
+//
+//                if (i >= mrchIndx_Start && i < weapIndx_Start) {
+//                    marchIDs[mrchCount] = rawItems[i].getInt(null);
+//                    mrchCount++;
+//                }
+//                else if (i >= weapIndx_Start && i < rawItems.length) {
+//                    weaponIDs[weapCount] = rawItems[i].getInt(null);
+//                    weapCount++;
+//                }
+//
+//                startIndstr++;
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
+//
+//    private Boolean BadStr_check(String a){
+//
+//        // this gets rid of the random crap that is generated when you fill
+//        // a Field object made from R.raw.class.getDecalredFields
+//
+//        // primemarch is not one of them.
+//
+//        if (a == "$change" ||
+//            a == "serialVersionUID") {
+//
+//            System.out.println("BADSTR_CHECK : " + a);
+//            return Boolean.FALSE;
+//        }
+//        else {
+//            return Boolean.TRUE;
+//        }
+//    }
+//
+//    private Boolean Type_Check(String a, String b){
+//        if (a.contains(b)) {
+//            System.out.println("MATCH     " + a + "   " + b);
+//            return true;
+//        }
+//        return false;
+//    }
 
     public void playVoice(int rawID){
         try{
@@ -376,7 +406,6 @@ public class MainActivity extends AppCompatActivity{
             set_playAll_false();
         }
     }
-
     public void set_playAll_false(){
         playAllaudio_Bool = Boolean.FALSE;
     }
@@ -390,32 +419,10 @@ public class MainActivity extends AppCompatActivity{
         mediaPlayer_MARCH.reset();
     }
 
-    private Boolean BadStr_check(String a){
-
-        // this gets rid of the random crap that is generated when you fill
-        // a Field object made from R.raw.class.getDecalredFields
-
-        // primemarch is not one of them.
-
-        if (a == "$change" ||
-            a == "serialVersionUID") {
-
-            System.out.println("BADSTR_CHECK : " + a);
-            return Boolean.FALSE;
-        }
-        else {
-            return Boolean.TRUE;
-        }
-    }
-
-    private Boolean Type_Check(String a, String b){
-        String c = a.substring(0, Math.min(a.length(), b.length()));
-
-        if (a.contains(b)) {
-            System.out.println("MATCH     " + a + "   " + b);
-            return true;
-        }
-        return false;
+    public void playMarch(){
+        mediaPlayer_MARCH.reset();
+        mediaPlayer_MARCH = MediaPlayer.create(this, marchAudio_Main);
+        mediaPlayer_MARCH.start();
     }
 
     public boolean isExternalStorageWritable() {
