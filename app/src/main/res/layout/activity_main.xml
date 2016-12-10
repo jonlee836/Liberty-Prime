@@ -38,6 +38,7 @@
             android:text="DEATH TO THE INSTITUTE\nAD VICTORIUM"
             android:textAppearance="@style/TextAppearance.AppCompat"
             android:onClick="AD_VICTORIUM"
+            android:outlineProvider="background"
             android:clickable="true"
 
             android:layout_height="wrap_content"
@@ -45,7 +46,8 @@
             android:fontFamily="serif-monospace"
             android:lineSpacingExtra="12sp"
             android:textAlignment="center"
-            android:textStyle="normal|bold" />
+            android:textStyle="normal|bold"
+            android:drawableTintMode="multiply" />
 
         <TableLayout
             android:layout_width="match_parent"
@@ -64,8 +66,8 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:headerDividersEnabled="true"
-            android:footerDividersEnabled="true"
+            android:headerDividersEnabled="false"
+            android:footerDividersEnabled="false"
             android:scrollbarSize="?android:attr/actionBarSize"
             style="@style/AlertDialog.AppCompat.Light" />
 
