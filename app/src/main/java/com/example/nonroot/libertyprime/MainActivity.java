@@ -30,6 +30,8 @@ import java.util.Random;
 
 public class MainActivity extends AppCompatActivity{
 
+    Boolean playAllaudio_Bool = Boolean.TRUE;
+
     Field rawItems[];
 
     int marchAudio_Main, currRawID;
@@ -37,8 +39,6 @@ public class MainActivity extends AppCompatActivity{
 
     String audioFileNames[];
     ListView ListView_audioFileNames;
-
-    Boolean playAllaudio_Bool = Boolean.TRUE;
 
     TextView TextView_audioName;
     MediaPlayer mediaPlayer_VOICE, mediaPlayer_MARCH;
