@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity{
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo){
         menu.add(v.getId(), 1, 0, "Download as Ringtone");
-        menu.add(v.getId(), 2, 0, "Send as voice mail");
+        //menu.add(v.getId(), 2, 0, "Send as voice mail");
     }
 
     @Override
@@ -257,14 +257,11 @@ public class MainActivity extends AppCompatActivity{
 
                 Toast.makeText(getApplicationContext(), "Downloaded Ringtone!", Toast.LENGTH_LONG).show();
 
-                // Not sure why I can't directly set the ringtone after downloading.
-                // setRingtone(INDEPENDENCE, PATRIOT);
-
                 break;
-            case 2:
-                Toast.makeText(getApplicationContext(), "some other option", Toast.LENGTH_LONG).show();
-                System.out.println("CLICKED OTHER OPTION");
-                break;
+//            case 2:
+//                Toast.makeText(getApplicationContext(), "some other option", Toast.LENGTH_LONG).show();
+//                System.out.println("CLICKED OTHER OPTION");
+//                break;
         }
         return true;
     }
@@ -312,38 +309,4 @@ public class MainActivity extends AppCompatActivity{
         }
         return false;
     }
-
-    public void setRingtone(File INDEPENDENCE, String PATRIOT){
-        try {
-            File k = new File(INDEPENDENCE, PATRIOT);
-
-            ContentValues contentValues = new ContentValues();
-            contentValues.put("_data", k.getAbsolutePath());
-            contentValues.put("title", PATRIOT);
-            contentValues.put("mime_type", "audio/mp3");
-            contentValues.put("_size", Long.valueOf(k.length()));
-            contentValues.put("artist", Integer.valueOf(R.string.app_name));
-            contentValues.put("is_ringtone", Boolean.valueOf(true));
-            contentValues.put("is_notification", Boolean.valueOf(true));
-            contentValues.put("is_alarm", Boolean.valueOf(false));
-            contentValues.put("is_music", Boolean.valueOf(false));
-
-            try {
-                //Uri parse = Uri.parse(this.PATH_TO_FREEDOM);
-                //ContentResolver contentResolver = getContentResolver();
-                //RingtoneManager.setActualDefaultRingtoneUri(getBaseContext(), 1, contentResolver.insert(MediaStore.Audio.Media.getContentUriForPath(k.getAbsolutePath()), contentValues));
-                //sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse(SOUND_OF_LIBERTY)));
-                System.out.println("working!");
-                Toast.makeText(this, new StringBuilder().append("Downloaded as Ringtone!"), Toast.LENGTH_LONG).show();
-
-            } catch (Throwable th) {
-                System.out.println("NOT WORKING");
-                Toast.makeText(this, new StringBuilder().append("Ringtone feature is not working"), Toast.LENGTH_LONG).show();
-            }
-        }
-        catch (Throwable t) {
-            System.out.println("FILE NOT FOUND : THIS IS AFTER IT WAS WRITTEN TO STORAGE");
-        }
-    }
-
 }
