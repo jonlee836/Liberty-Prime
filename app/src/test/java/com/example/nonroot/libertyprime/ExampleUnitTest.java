@@ -1,4 +1,4 @@
-package com.example.nonroot.libertyprime;
+package com.example.nonroot.LibertyPrime;
 
 import org.junit.Test;
 

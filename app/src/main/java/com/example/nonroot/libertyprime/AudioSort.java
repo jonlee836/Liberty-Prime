@@ -1,7 +1,4 @@
-package com.example.nonroot.libertyprime;
-
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+package com.example.nonroot.LibertyPrime;
 
 import java.lang.reflect.Field;
 

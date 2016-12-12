@@ -1,4 +1,4 @@
-package com.example.nonroot.libertyprime;
+package com.example.nonroot.LibertyPrime;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

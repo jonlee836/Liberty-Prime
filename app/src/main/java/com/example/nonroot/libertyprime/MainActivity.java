@@ -1,7 +1,6 @@
-package com.example.nonroot.libertyprime;
+package com.example.nonroot.LibertyPrime;
 import android.Manifest;
 import android.app.Activity;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
@@ -41,7 +40,6 @@ public class MainActivity extends AppCompatActivity{
     ListView ListView_audioFileNames;
 
     Boolean playAllaudio_Bool = Boolean.TRUE;
-    Boolean onFirstRun = Boolean.TRUE;
 
     TextView TextView_audioName;
     MediaPlayer mediaPlayer_VOICE, mediaPlayer_MARCH;
@@ -165,7 +163,7 @@ public class MainActivity extends AppCompatActivity{
     public void folderCheck(){
 
         File INDEPENDENCE =  Environment.getExternalStorageDirectory();
-        File CONTINENTAL = new File(INDEPENDENCE+"/LibertyPrime");
+        File CONTINENTAL = new File(INDEPENDENCE+"/libertyprime");
 
         boolean exists = (new File(CONTINENTAL.toString())).exists();
 
@@ -213,7 +211,7 @@ public class MainActivity extends AppCompatActivity{
                 InputStream fIn = getBaseContext().getResources().openRawResource(voiceIDs[acmi]);
 
                 String PATRIOT = audioFileNames[acmi];
-                File INDEPENDENCE = new File(Environment.getExternalStorageDirectory()+"/LibertyPrime");
+                File INDEPENDENCE = new File(Environment.getExternalStorageDirectory()+"/libertyprime");
                 String SOUND_OF_LIBERTY = INDEPENDENCE.getAbsolutePath() + "/" + PATRIOT + ".mp3";
 
                 boolean exists = (new File(SOUND_OF_LIBERTY.toString())).exists();

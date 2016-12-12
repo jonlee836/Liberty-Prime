@@ -12,7 +12,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:padding="0dp"
     android:background="@drawable/libertyprime_4"
-    tools:context="com.example.nonroot.libertyprime.MainActivity">
+    tools:context="com.example.nonroot.LibertyPrime.MainActivity">
 
     <ImageButton
         android:id="@+id/playAll_Icon"
