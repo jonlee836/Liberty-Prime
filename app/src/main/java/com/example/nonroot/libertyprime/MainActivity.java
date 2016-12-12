@@ -26,8 +26,7 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.Random;
 
-// Source code for the Liberty Prime sound board.
-// All variable names are intentional for obvious reasons.
+// Source code for the Fallout 4 Liberty Prime sound board.
 
 public class MainActivity extends AppCompatActivity{
 
