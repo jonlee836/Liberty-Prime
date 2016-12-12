@@ -7,11 +7,9 @@ import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
@@ -49,7 +47,7 @@ public class MainActivity extends AppCompatActivity{
     MediaPlayer mediaPlayer_VOICE, mediaPlayer_MARCH;
     ImageView playAll_Icon;
 
-    //AudioManager audioMngr;
+    AudioManager audioMngr;
 
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {
@@ -81,8 +79,8 @@ public class MainActivity extends AppCompatActivity{
         TextView_audioName = (TextView) findViewById(R.id.topLabel_ADVICTORIUM);
 
         // create AudioManager and set the volume to max on app launch.
-        //audioMngr = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        //audioMngr.setStreamVolume(AudioManager.STREAM_MUSIC, 30, 0);
+        audioMngr = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        audioMngr.setStreamVolume(AudioManager.STREAM_MUSIC, 100, 0);
 
         final ArrayAdapter adapter_for_List = new ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, audioFileNames);
 
@@ -96,7 +94,7 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 String audio_filename = audioFileNames[position];
-                Log.v("long clicked", String.valueOf(audio_filename));
+                System.out.println("Long Clicked");
 
                 return false;
             }
@@ -152,7 +150,6 @@ public class MainActivity extends AppCompatActivity{
         int acmi_pos = acmi.position;
         download_Ringtone(item, acmi_pos, audio_file_name);
 
-        Log.v("long clicked",String.valueOf(audio_file_name));
         return false;
     }
 
@@ -345,7 +342,7 @@ public class MainActivity extends AppCompatActivity{
             }
         }
         catch (Throwable t) {
-            Log.d("test", "FILE NOT FOUND, THIS IS AFTER IT WAS WRITTEN TO STORAGE");
+            System.out.println("FILE NOT FOUND : THIS IS AFTER IT WAS WRITTEN TO STORAGE");
         }
     }
 
