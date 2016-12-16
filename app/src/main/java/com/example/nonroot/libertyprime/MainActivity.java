@@ -162,7 +162,7 @@ public class MainActivity extends AppCompatActivity{
     public void folderCheck(){
 
         File INDEPENDENCE =  Environment.getExternalStorageDirectory();
-        File CONTINENTAL = new File(INDEPENDENCE+"/libertyprime");
+        File CONTINENTAL = new File(INDEPENDENCE+"/LibertyPrime");
 
         boolean exists = (new File(CONTINENTAL.toString())).exists();
 
@@ -210,7 +210,7 @@ public class MainActivity extends AppCompatActivity{
                 InputStream fIn = getBaseContext().getResources().openRawResource(voiceIDs[acmi]);
 
                 String PATRIOT = audioFileNames[acmi];
-                File INDEPENDENCE = new File(Environment.getExternalStorageDirectory()+"/libertyprime");
+                File INDEPENDENCE = new File(Environment.getExternalStorageDirectory()+"/LibertyPrime");
                 String SOUND_OF_LIBERTY = INDEPENDENCE.getAbsolutePath() + "/" + PATRIOT + ".mp3";
 
                 boolean exists = (new File(SOUND_OF_LIBERTY.toString())).exists();
