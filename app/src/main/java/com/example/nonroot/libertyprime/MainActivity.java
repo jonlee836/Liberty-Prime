@@ -149,7 +149,7 @@ public class MainActivity extends AppCompatActivity{
 
         return false;
     }
-
+ 
         public static void permissionCheck(Activity activity) {
         int writePermission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         int readPermission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE);
